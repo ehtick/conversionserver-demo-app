@@ -195,7 +195,7 @@ async function _checkPendingConversions() {
                     console.log("fetch error");
                 } 
                 const data = await res.json();
-                if (data != "NOTFOUND") {
+                if (data.error ==undefined) {
                     if (data.conversionState == "SUCCESS") {
                         notConverted[i].converted = true;
                         notConverted[i].save();

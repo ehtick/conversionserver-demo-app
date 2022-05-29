@@ -16,7 +16,6 @@ router.get('/png/:itemid', apiController.getPNG);
 router.get('/step/:itemid', apiController.getSTEP);
 router.put('/generateStep/:itemid', apiController.generateSTEP);
 
-
 router.put('/deleteModel/:itemid', apiController.deleteModel);
 
 router.put('/newproject/:projectname', loginController.putNewProject);
