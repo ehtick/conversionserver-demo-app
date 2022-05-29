@@ -103,7 +103,7 @@ exports.processFromToken = async (itemid, project, startpath) => {
     console.log("processing:" + item.name);
     let api_arg  = {startPath:startpath};
 
-    res = await fetch(conversionServiceURI + '/api/reconvert/' + item.storageID, { headers: { 'CS-API-Arg': JSON.stringify(api_arg) } });
+    res = await fetch(conversionServiceURI + '/api/reconvert/' + item.storageID, { method: 'put',headers: { 'CS-API-Arg': JSON.stringify(api_arg) } });
 
 };
 
@@ -117,7 +117,7 @@ exports.generateSTEP = async (itemid, project, startpath) => {
         await item.save();
         console.log("processing STEP:" + item.name);
         let api_arg  = {conversionCommandLine:["--output_step",""] };            
-        res = await fetch(conversionServiceURI + '/api/reconvert/' + item.storageID, { headers: { 'CS-API-Arg': JSON.stringify(api_arg) } });
+        res = await fetch(conversionServiceURI + '/api/reconvert/' + item.storageID, { method: 'put',headers: { 'CS-API-Arg': JSON.stringify(api_arg) } });
          _updated();
 
     }
