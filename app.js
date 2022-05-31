@@ -91,6 +91,11 @@ mongoose
       store: store
     }));
 
+    
+    app.get('/', function(req, res){
+      res.sendFile(__dirname + '/public/viewer.html');
+    });
+
     app.use("/api", loginRoutes);
     app.use(middleware.requireLogin);
     app.use("/api", apiRoutes);

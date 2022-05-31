@@ -291,11 +291,13 @@ class CsManagerClient {
                 let byteArray = new Uint8Array(ab);
                 if (this._modelHash[modelid].name.indexOf(".dwg") != -1 && numberchecked == 0)
                 {
+                    hwv.view.setAmbientOcclusionEnabled(false);
                     await hwv.model.loadSubtreeFromScsBuffer(hwv.model.getRootNode(), byteArray);
                     this._modelHash[modelid].nodeid = hwv.model.getRootNode();
                 }
                 else
                 {
+                    hwv.view.setAmbientOcclusionEnabled(true);
                     let modelnode = hwv.model.createNode(modelid);
                     await hwv.model.loadSubtreeFromScsBuffer(modelnode, byteArray);
                     this._modelHash[modelid].nodeid = modelnode;
