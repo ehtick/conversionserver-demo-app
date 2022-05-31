@@ -38,7 +38,7 @@ exports.postLogin = async(req, res, next) => {
         if (result)
         {       
             req.session.user = item; 
-            res.json({succeeded:true, user:req.session.user});
+            res.json({succeeded:true, user:req.session.user.email});
         }
         else
             res.json({succeeded:false});
@@ -56,7 +56,14 @@ exports.checkLogin = async(req, res, next) => {
     console.log("check login");
     if (req.session && req.session.user) {
         console.log(req.session.project);
-        res.json({succeeded:true, user:req.session.user});
+        let projectid = null;
+        let projectname = null;
+        if (req.session.project)
+        {
+            projectid = req.session.project._id;
+            projectname = req.session.project.name;
+        }
+        res.json({succeeded:true, user:req.session.user.email, project:projectid});
     }
     else
         res.json({succeeded:false});
@@ -108,11 +115,17 @@ exports.putRenameProject = async(req, res, next) => {
 
 exports.putProject = async(req, res, next) => {    
 
-    let item = await Projects.findOne({ "_id": req.params.projectid });
-    req.session.project = item;
-    res.json({projectname:item.name});
-
+    if (req.params.projectid != "none") {
+        var item = await Projects.findOne({ "_id": req.params.projectid });
+        req.session.project = item;
+        res.json({projectname:item.name});
+    }
+    else {
+        req.session.project = null;
+        res.sendStatus(200);
+    }
 };
+
 
 exports.getProjects = async(req, res, next) => {    
 

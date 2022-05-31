@@ -23,8 +23,10 @@ class MainUI {
 
     }
     
-    toggleExpansion(div){
+  
+    toggleExpansion(div,element){
         var sidebar = this.sideBars[div];
+        $(".sidenav").children().css("color", "");
         if (!sidebar.expanded)
         {
             this.collapseAll();
@@ -38,6 +40,7 @@ class MainUI {
             $("#content").css("margin-left", (sidebar.width + 50) + "px"); 
             $("#content").css({ "width": newwidth + "px" });
             sidebar.expanded = true;
+            $(element).css("color", "white");
 
         }
         else
@@ -46,6 +49,7 @@ class MainUI {
             $("#content").css("margin-left", ""); 
             $("#content").css({ "width": "" });
             sidebar.expanded = false;
+            $(element).css("color", "");
         }
         if (sidebar.callback)
             sidebar.callback(sidebar.expanded);
@@ -53,6 +57,7 @@ class MainUI {
         ui._toolbar.reposition();
         hwv.resizeCanvas();
     }
+
 
 }
 

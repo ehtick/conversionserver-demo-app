@@ -22,10 +22,18 @@ class Admin {
         {
             this.activeUser = data.user;
             $(".loggedinuser").empty();
-            $(".loggedinuser").append(data.user.email);
+            $(".loggedinuser").append(data.user);
 
-            this.handleProjectSelection();
-//            CsManagerClient.msready();
+            
+            if (!data.project) {
+                this.handleProjectSelection();
+            }
+            else {
+                if (data.demomode) {
+                    demoMode = true;
+                }
+                this.loadProject(data.project);
+            }
         }
         updateMenu();
     }
@@ -39,6 +47,7 @@ class Admin {
 
     async handleProjectSwitch()
     {
+        await fetch(serveraddress + '/api/project/none', { method: 'PUT' });
         window.location.reload(true); 
 
     }
