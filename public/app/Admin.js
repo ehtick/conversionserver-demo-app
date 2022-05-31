@@ -78,12 +78,15 @@ class Admin {
 
 
     async loadProject() {
+        this.currentProject = $("#projectselect").val();
         var res = await fetch(serveraddress + '/api/project/' + $("#projectselect").val(), { method: 'PUT' });
         $(".projectname").empty();
         var data = await res.json();
-        $(".projectname").append(data.projectname);        
+        $(".projectname").append(data.projectname);  
 
-         CsManagerClient.msready();
+        this.currentProject = data.projectname;              
+        updateMenu();
+        CsManagerClient.msready();
 
     }
 
@@ -98,7 +101,7 @@ class Admin {
         $("#projectselect").empty();
         var html = "";
         for (var i = 0; i < models.length; i++) {
-            var cm = models[i]
+            let cm = models[i];
             html += '<option value="' + cm.id + '">' + cm.name + '</option>';
         }
         $("#projectselect").append(html);

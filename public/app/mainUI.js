@@ -59,7 +59,7 @@ class MainUI {
 function updateMenu()
 {
     if (!myAdmin.activeUser)
-    {
+    {     
         $("li:contains(Logout)").css("opacity", "0.2");
         $("li:contains(Logout)").css("pointer-events", "none");
 
@@ -73,9 +73,11 @@ function updateMenu()
         $("li:contains(Switch Project)").css("opacity", "0.2");
         $("li:contains(Switch Project)").css("pointer-events", "none");
 
+
     }
     if (myAdmin.activeUser)
     {
+      
         $("li:contains(Logout)").css("opacity", "1.0");
         $("li:contains(Logout)").css("pointer-events", "all");
 
@@ -88,6 +90,18 @@ function updateMenu()
         $("li:contains(Register)").css("opacity", "0.2");
         $("li:contains(Register)").css("pointer-events", "none");
 
+
+    }
+
+    if (myAdmin.currentProject) {
+        $("#content").css("display", "block");
+        $("body").css("background", "");
+        $(".sidenav").css("pointer-events", "");
+    }
+    else {
+        $("#content").css("display", "none");
+        $("body").css("background", "grey");
+        $(".sidenav").css("pointer-events", "none");
 
     }
 }

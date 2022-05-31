@@ -129,7 +129,7 @@ class CsManagerClient {
 
             if (part) {
                 if (!this._modelHash[data[i].id]) {
-                    this._modelHash[data[i].id] = { nodeid: null, name: data[i].name, tree: null, image: part, filesize: data[i].filesize, uploaded: data[i].uploaded};
+                    this._modelHash[data[i].id] = { nodeid: null, name: data[i].name,image: part, filesize: data[i].filesize, uploaded: data[i].uploaded};
                 }
                 this._modelHash[data[i].id].image = part;
                 this._modelHash[data[i].id].hasStep  = data[i].hasStep;
@@ -208,6 +208,20 @@ class CsManagerClient {
                 }
             },
             {
+                name: 'Download SCS',
+                fun: async function (item) {
+                    let modelid = item.trigger[0].id.split("_")[1];
+
+                    let res = await fetch(serveraddress + '/api/scs/' + modelid);
+                    let ab = await res.arrayBuffer();
+                    let byteArray = new Uint8Array(ab);
+
+                    csManagerClient._exportToFile(byteArray, csManagerClient._modelHash[modelid].name + ".scs");
+                   
+
+                }
+            },
+            {
                 name: 'Delete',
                 fun: async function (item) {
                     //csManagerClient
@@ -216,7 +230,6 @@ class CsManagerClient {
                     if (csManagerClient._modelHash[modelid].nodeid != null) {
                         hwv.model.deleteNode(csManagerClient._modelHash[modelid].nodeid);
                         csManagerClient._modelHash[modelid].nodeid = null;
-                        csManagerClient._modelHash[modelid].tree.remove();
                     }
                     delete csManagerClient._modelHash[modelid];
                     await fetch(serveraddress + '/api/deleteModel/' + modelid, { method: 'PUT'});
@@ -231,15 +244,15 @@ class CsManagerClient {
             let newViewerMenu;
             if (item.hasStep == "true")
             {
-                newViewerMenu = [viewermenu[1], viewermenu[2]];
+                newViewerMenu = [viewermenu[1], viewermenu[2],viewermenu[3]];
             }
             else if (item.hasStep == "pending")
             {
-                newViewerMenu = [viewermenu[2]];
+                newViewerMenu = [viewermenu[2],viewermenu[3]];
             }
             else
             {
-                newViewerMenu = [viewermenu[0], viewermenu[2]];
+                newViewerMenu = [viewermenu[0], viewermenu[2],viewermenu[3]];
             }
 
             $(this).contextMenu("menu", newViewerMenu, {
@@ -255,6 +268,17 @@ class CsManagerClient {
     async addModel(o, modelid) {
         if (o.checked) {
             if (this._modelHash[modelid].nodeid == null) {
+                let numberchecked = 0;
+                for (var i in this._modelHash) {
+                    if (this._modelHash[i].nodeid != null) {
+                        numberchecked++;
+                    }
+                }
+                if (numberchecked == 0)
+                {
+                    hwv.model.clear();
+                }
+
                 let res;
                 if (useDirectFetch) {
                     res = await fetch(serveraddress + '/api/downloadToken/' + modelid + "/" + "scs");
@@ -263,29 +287,34 @@ class CsManagerClient {
                 }
                 else
                     res = await fetch(serveraddress + '/api/scs/' + modelid);
-                var ab = await res.arrayBuffer();
-                var byteArray = new Uint8Array(ab);
-                var modelnode = hwv.model.createNode(modelid);
-                var nodeids = await hwv.model.loadSubtreeFromScsBuffer(modelnode, byteArray);
-                this._modelHash[modelid].nodeid = modelnode;
+                let ab = await res.arrayBuffer();
+                let byteArray = new Uint8Array(ab);
+                if (this._modelHash[modelid].name.indexOf(".dwg") != -1 && numberchecked == 0)
+                {
+                    await hwv.model.loadSubtreeFromScsBuffer(hwv.model.getRootNode(), byteArray);
+                    this._modelHash[modelid].nodeid = hwv.model.getRootNode();
+                }
+                else
+                {
+                    let modelnode = hwv.model.createNode(modelid);
+                    await hwv.model.loadSubtreeFromScsBuffer(modelnode, byteArray);
+                    this._modelHash[modelid].nodeid = modelnode;
+                }
             }
 
         }
         else {           
-            hwv.model.deleteNode(this._modelHash[modelid].nodeid);
+            if (this._modelHash[modelid].nodeid != hwv.model.getRootNode()) {            
+                hwv.model.deleteNode(this._modelHash[modelid].nodeid);
+            }
+            else
+            {
+                hwv.model.clear();
+            }
             this._modelHash[modelid].nodeid = null;
         }
     }
 
-    async _loadNewModel(modelid) {
-        await hwv.model.clear();
-        var res = await fetch(serveraddress + '/api/scs/' + modelid);
-        var ab = await res.arrayBuffer();
-        var byteArray = new Uint8Array(ab);
-        hwv.model.loadSubtreeFromScsBuffer(hwv.model.getRootNode(), byteArray);
-    }
-
-      
     _exportToFile(data, filename) {
 
         function _makeBinaryFile(text) {
