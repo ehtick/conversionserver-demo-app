@@ -65,7 +65,8 @@ class Admin {
 
     async newProject() {
         var res = await fetch(serveraddress + '/api/newproject/' + $("#newProjectName").val(), { method: 'PUT' });
-        this.handleProjectSelection();
+        var data = await res.json();
+        this.loadProject(data.projectid);
     }
 
 
@@ -77,9 +78,9 @@ class Admin {
     }
 
 
-    async loadProject() {
-        this.currentProject = $("#projectselect").val();
-        var res = await fetch(serveraddress + '/api/project/' + $("#projectselect").val(), { method: 'PUT' });
+    async loadProject(projectid) {
+       
+        var res = await fetch(serveraddress + '/api/project/' + projectid, { method: 'PUT' });
         $(".projectname").empty();
         var data = await res.json();
         $(".projectname").append(data.projectname);  
@@ -89,6 +90,11 @@ class Admin {
         CsManagerClient.msready();
 
     }
+
+    async loadProjectFromDialog() {
+        await this.loadProject($("#projectselect").val());
+    }
+
 
 
 
