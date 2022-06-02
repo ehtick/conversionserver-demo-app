@@ -19,6 +19,12 @@ function msready() {
     myAdmin.checkLogin();
     myAdmin.getConfiguration();
 
+    $(window).resize(function () {
+      resizeCanvas();
+    });
+
+    $(".webviewer-canvas").css("outline", "none");
+
   }, 10);
 }
 
@@ -64,5 +70,19 @@ function setupApp() {
 
   mainUI = new MainUI();
   mainUI.registerSideBars("sidebar_models",450);
+
 }
 
+function resizeCanvas()
+{
+ 
+    let offset = $("#content").offset();
+    let width = $(window).width() - offset.left;
+    let height = $(window).height() - offset.top;
+    $("#content").css("width", width + "px");
+    $("#content").css("height", (height) + "px");
+    hwv.resizeCanvas();
+    $("#toolBar").css("left", (width/2-250) + "px");
+    $("#toolBar").css("top", (height-50) +  "px");
+   
+}

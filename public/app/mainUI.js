@@ -54,8 +54,8 @@ class MainUI {
         if (sidebar.callback)
             sidebar.callback(sidebar.expanded);
 
-        ui._toolbar.reposition();
-        hwv.resizeCanvas();
+        resizeCanvas();
+
     }
 
 

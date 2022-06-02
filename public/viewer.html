@@ -88,19 +88,12 @@
         function (viewer) {
           hwv = viewer;
 
-          window.onresize = function (event) {
-            // jQuery resizable triggers onresize, check that the call is not coming from a DOM element object
-            if (typeof event.target.getAttribute !== "function") {
-              hwv.resizeCanvas();
-            }
-          };
-
           var screenConfiguration =
             md.mobile() !== null
               ? Communicator.ScreenConfiguration.Mobile
               : Sample.screenConfiguration;
           var uiConfig = {
-            containerId: "content",
+            containerId: "viewerContainer",
             screenConfiguration: screenConfiguration,
             showModelBrowser: true,
             showToolbar: true,
