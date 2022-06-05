@@ -17,14 +17,15 @@ class MainUI {
         for (var i in this.sideBars)
         {
             $("#" + i).css({ "display": "none" });  
-            this.sideBars[i].expanded = false;
-       
+            this.sideBars[i].expanded = false;       
+            $("#" + i + "_button").css("color", "");
         }
+        $("#content").css("margin-left", "40px"); 
+        $("#content").css({ "width": "" });
 
     }
-    
-  
-    toggleExpansion(div,element){
+
+    toggleExpansion(div){
         var sidebar = this.sideBars[div];
         $(".sidenav").children().css("color", "");
         if (!sidebar.expanded)
@@ -37,28 +38,21 @@ class MainUI {
             $("#" + div).css({ "width": sidebar.width + "px" });         
             var newwidth = $("#content").width() - (sidebar.width + 50);
 
-            $("#content").css("margin-left", (sidebar.width + 50) + "px"); 
+            $("#content").css("margin-left", (sidebar.width + 40) + "px"); 
             $("#content").css({ "width": newwidth + "px" });
             sidebar.expanded = true;
-            $(element).css("color", "white");
+            $("#" + div + "_button").css("color", "white");
 
         }
         else
         {
-            this.collapseAll();
-            $("#content").css("margin-left", ""); 
-            $("#content").css({ "width": "" });
-            sidebar.expanded = false;
-            $(element).css("color", "");
+            this.collapseAll();         
         }
         if (sidebar.callback)
             sidebar.callback(sidebar.expanded);
 
         resizeCanvas();
-
     }
-
-
 }
 
 function updateMenu()
