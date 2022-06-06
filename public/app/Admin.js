@@ -3,6 +3,8 @@ class Admin {
     constructor() {
         this.activeUser = null;
         this.currentProject = null;
+        this.demoMode = false;
+        this.useDirectFetch = false;
 
     }
 
@@ -11,11 +13,13 @@ class Admin {
     {
         var res = await fetch(serveraddress + '/api/configuration');
         var data = await res.json();
-        useDirectFetch = data.useDirectFetch;              
+        this.useDirectFetch = data.useDirectFetch;      
+        this.demoMode = data.demoMode;                 
     }
 
     async checkLogin()
     {
+        this.getConfiguration();
         var res = await fetch(serveraddress + '/api/checklogin');
         var data = await res.json();
         if (data.succeeded)

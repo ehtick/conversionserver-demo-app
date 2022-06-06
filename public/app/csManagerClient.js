@@ -1,5 +1,4 @@
 var csManagerClient = null;
-var useDirectFetch = true;
 
 class CsManagerClient {
 
@@ -7,7 +6,7 @@ class CsManagerClient {
 
         csManagerClient = new CsManagerClient();
         let myDropzone;
-        if (!useDirectFetch) {
+        if (!myAdmin.useDirectFetch) {
 
             myDropzone = new Dropzone("div#dropzonearea", { url: serveraddress + "/api/upload", timeout: 180000 });
             myDropzone.on("success", async function (file, response) {
@@ -105,7 +104,7 @@ class CsManagerClient {
             var file = data[i].name.split(".")[0];
             if (!data[i].pending) {
                 let image = null;
-                if (useDirectFetch) {
+                if (myAdmin.useDirectFetch) {
                     let res = await fetch(serveraddress + '/api/downloadToken/' + data[i].id + "/" + "png");
                     let json = await res.json();
                     if (!json.error) {
@@ -280,7 +279,7 @@ class CsManagerClient {
                 }
 
                 let res;
-                if (useDirectFetch) {
+                if (myAdmin.useDirectFetch) {
                     res = await fetch(serveraddress + '/api/downloadToken/' + modelid + "/" + "scs");
                     let json = await res.json();
                     res = await fetch(json.token);

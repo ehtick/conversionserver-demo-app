@@ -48,12 +48,27 @@ exports.postLogin = async(req, res, next) => {
 
 exports.configuration = async(req, res, next) => {    
     console.log("configuration");    
-    res.json({useDirectFetch : config.get('app.useDirectFetch')});    
+    res.json({useDirectFetch : config.get('app.useDirectFetch'),demoMode: config.get('app.demoMode')});    
 };
+
 
 
 exports.checkLogin = async(req, res, next) => {    
     console.log("check login");
+    if (config.get('app.demoMode')) {
+        let item = await Users.findOne({ "email":  "guido@techsoft3d.com" });
+        if (item)
+        {
+            var project = await Projects.findOne({ "user": item.id, "name": "Demo Project" });
+            if (project)
+            {
+                req.session.user = item;
+                req.session.project = project;
+            }
+        }
+
+    }
+
     if (req.session && req.session.user) {
         console.log(req.session.project);
         let projectid = null;

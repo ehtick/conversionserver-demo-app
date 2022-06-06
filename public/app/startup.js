@@ -17,7 +17,7 @@ function msready() {
 
     myAdmin = new Admin();
     myAdmin.checkLogin();
-    myAdmin.getConfiguration();
+  
 
     $(window).resize(function () {
       resizeCanvas();

@@ -3,6 +3,7 @@
     "mongodbURI": "mongodb://localhost:27017/csfrontend",
     "conversionServiceURI": "http://localhost:3001",
     "useCSAPI": false,
-    "useDirectFetch": false
+    "useDirectFetch": false,
+    "demoMode": false
   }
 }
