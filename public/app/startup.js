@@ -16,6 +16,8 @@ function msready() {
     hwv.view.setAmbientOcclusionEnabled(true);
 
     myAdmin = new Admin();
+    myAdmin.setUpdateUICallback(mainUI.updateMenu);
+
     myAdmin.checkLogin();
   
 

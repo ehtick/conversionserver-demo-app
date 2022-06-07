@@ -5,8 +5,28 @@ class Admin {
         this.currentProject = null;
         this.demoMode = false;
         this.useDirectFetch = false;
+        this._newProjectCallback = null;
+        this._updateUICallback = null;
+       
 
     }
+
+    setNewProjectCallback(newprojectcallback)
+    {
+        this._newProjectCallback = newprojectcallback;
+    }
+
+    setUpdateUICallback(updateuicallback)
+    {
+        this._updateUICallback = updateuicallback;
+    }
+
+    _updateUI() {
+        if (this._updateUICallback) {
+            this._updateUICallback();
+        }
+    }
+
 
 
     async getConfiguration()
@@ -33,13 +53,11 @@ class Admin {
                 this.handleProjectSelection();
             }
             else {
-                if (data.demomode) {
-                    demoMode = true;
-                }
+                
                 this.loadProject(data.project);
             }
         }
-        updateMenu();
+        this._updateUI();
     }
 
     async handleLogout()
@@ -58,15 +76,15 @@ class Admin {
 
 
     handleNewProjectDialog() {
-        var myModal = new bootstrap.Modal(document.getElementById('newprojectModal'));
-        myModal.show();
+        let myModal = new bootstrap.Modal(document.getElementById('newprojectModal'));
+        myModal.toggle();
     }
 
 
     handleRenameProjectDialog() {
         this.currentProject = $("#projectselect").val();
-        var myModal = new bootstrap.Modal(document.getElementById('renameprojectModal'));
-        myModal.show();
+        let myModal = new bootstrap.Modal(document.getElementById('renameprojectModal'));
+        myModal.toggle();
     }
 
 
@@ -81,6 +99,7 @@ class Admin {
         var data = await res.json();
         this.loadProject(data.projectid);
     }
+
 
 
     async deleteProject() {
@@ -99,7 +118,8 @@ class Admin {
         $(".projectname").append(data.projectname);  
 
         this.currentProject = data.projectname;              
-        updateMenu();
+        this._updateUI();
+        $(".modal-backdrop").remove();
         CsManagerClient.msready();
 
     }
@@ -112,8 +132,9 @@ class Admin {
 
 
     async handleProjectSelection() {
-        var myModal = new bootstrap.Modal(document.getElementById('chooseprojectModal'));
-        myModal.show();
+      
+        let myModal = new bootstrap.Modal(document.getElementById('chooseprojectModal'));
+        myModal.toggle();
         var response = await fetch(serveraddress + '/api/projects');
         var models = await response.json();
 
@@ -130,8 +151,8 @@ class Admin {
 
     handleRegistration()
     {
-        var myModal = new bootstrap.Modal(document.getElementById('registerusermodal'));
-        myModal.show();
+        let myModal = new bootstrap.Modal(document.getElementById('registerusermodal'));
+        myModal.toggle();
 
     }
 
@@ -161,7 +182,8 @@ class Admin {
 
     handleLogin()
     {
-        var myModal = new bootstrap.Modal(document.getElementById('loginusermodal'));
+      
+        let myModal = new bootstrap.Modal(document.getElementById('loginusermodal'));
         myModal.show();
 
         var input = document.getElementById("login_password");
@@ -191,17 +213,23 @@ class Admin {
             contentType: false,
             processData: false,
             success: function (response) {
-                if (!response.succeeded)
+
+
+                if (!response.succeeded) {
+
                     myAdmin.handleLogin();
-                else
-                {
+
+                }
+                else {
+
                     _this.activeUser = response.user;
                     $(".loggedinuser").empty();
-                    $(".loggedinuser").append(response.user.email);        
+                    $(".loggedinuser").append(response.user.email);
                     _this.handleProjectSelection();
-                    updateMenu();
-//                    CsManagerClient.msready();
+                    _this._updateUI();
                 }
+
+
             },
         });
     }
