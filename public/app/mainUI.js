@@ -67,6 +67,9 @@ class MainUI {
             $("li:contains(Switch Project)").css("opacity", "0.2");
             $("li:contains(Switch Project)").css("pointer-events", "none");
 
+            $("li:contains(Switch Hub)").css("opacity", "0.2");
+            $("li:contains(Switch Hub)").css("pointer-events", "none");
+
 
         }
         if (myAdmin.activeUser) {
@@ -79,6 +82,9 @@ class MainUI {
 
             $("li:contains(Switch Project)").css("opacity", "1");
             $("li:contains(Switch Project)").css("pointer-events", "all");
+
+            $("li:contains(Switch Hub)").css("opacity", "1");
+            $("li:contains(Switch Hub)").css("pointer-events", "all");
 
             $("li:contains(Register)").css("opacity", "0.2");
             $("li:contains(Register)").css("pointer-events", "none");

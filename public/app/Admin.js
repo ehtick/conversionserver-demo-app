@@ -48,8 +48,11 @@ class Admin {
             $(".loggedinuser").empty();
             $(".loggedinuser").append(data.user);
 
-            
-            if (!data.project) {
+               
+            if (!data.hub) {
+                this.handleHubSelection();
+            }
+            else if (!data.project) {
                 this.handleProjectSelection();
             }
             else {
@@ -70,6 +73,14 @@ class Admin {
     async handleProjectSwitch()
     {
         await fetch(serveraddress + '/api/project/none', { method: 'PUT' });
+        window.location.reload(true); 
+
+    }
+
+    
+    async handleHubSwitch()
+    {
+        await fetch(serveraddress + '/api/hub/none', { method: 'PUT' });
         window.location.reload(true); 
 
     }
@@ -129,6 +140,53 @@ class Admin {
     }
 
 
+    async loadHubFromDialog() {
+        await this.loadHub($("#hubselect").val());
+    }
+
+    
+
+    async handleHubSelection() {
+      
+        let myModal = new bootstrap.Modal(document.getElementById('choosehubModal'));
+        myModal.toggle();
+        var response = await fetch(serveraddress + '/api/hubs');
+        var models = await response.json();
+
+        $("#hubselect").empty();
+        var html = "";
+        for (var i = 0; i < models.length; i++) {
+            let cm = models[i];
+            html += '<option value="' + cm.id + '">' + cm.name + '</option>';
+        }
+        $("#hubselect").append(html);
+
+    }
+
+    
+    handleNewHubDialog() {
+        let myModal = new bootstrap.Modal(document.getElementById('newhubModal'));
+        myModal.toggle();
+    }
+
+    
+    async newHub() {
+        var res = await fetch(serveraddress + '/api/newhub/' + $("#newHubName").val(), { method: 'PUT' });
+        var data = await res.json();
+        this.loadHub(data.hubid);
+    }
+
+    
+    async loadHub(hubid) {
+       
+        var res = await fetch(serveraddress + '/api/hub/' + hubid, { method: 'PUT' });
+        var data = await res.json();
+        this.currentHub = data.hubname;  
+        this._updateUI();
+        this.handleProjectSelection();
+  
+
+    }
 
 
     async handleProjectSelection() {
@@ -225,7 +283,7 @@ class Admin {
                     _this.activeUser = response.user;
                     $(".loggedinuser").empty();
                     $(".loggedinuser").append(response.user.email);
-                    _this.handleProjectSelection();
+                    _this.handleHubSelection();
                     _this._updateUI();
                 }
 

@@ -23,3 +23,7 @@ router.put('/deleteproject/:projectid', loginController.putDeleteProject);
 router.put('/renameproject/:projectid/:newname', loginController.putRenameProject);
 router.put('/project/:projectid', loginController.putProject);
 router.get('/projects', loginController.getProjects);
+
+router.put('/hub/:hubid', loginController.putHub);
+router.get('/hubs', loginController.getHubs);
+router.put('/newhub/:hubname', loginController.putNewHub);

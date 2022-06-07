@@ -202,6 +202,32 @@
     </div>
   </div>
 
+  <div class="modal fade" id="choosehubModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Choose Hub</h5>        
+        </div>
+        <div class="modal-body">
+          <label class="form-label">Hub</label><br>
+          <select id = "hubselect" class="form-select form-select-sm mb-3" aria-label=".form-select-sm example">
+            <option selected>Choose Project...</option>
+            <option value="1">One</option>
+            <option value="2">Two</option>
+            <option value="3">Three</option>
+          </select>        
+        </div>
+        <br>
+        <div class="modal-footer">
+          <button type="button" onclick="myAdmin.deleteHub();" class="btn btn-secondary">Delete</button>
+          <button type="button" onclick="myAdmin.handleNewHubDialog();" class="btn btn-secondary" data-bs-dismiss="modal">New</button>
+          <button type="button" onclick="myAdmin.handleRenameHubDialog();" class="btn btn-secondary" data-bs-dismiss="modal">Rename</button>
+          <button type="button" onclick="myAdmin.loadHubFromDialog();" class="btn btn-primary" data-bs-dismiss="modal">Load</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="modal fade" id="newprojectModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -218,6 +244,27 @@
         <br>
         <div class="modal-footer">
           <button type="button" onclick="myAdmin.newProject();" class="btn btn-primary" data-bs-dismiss="modal">Create</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="newhubModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">New Hub</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="newHubName" class="form-label">Name</label>
+            <input type="text" class="form-control" id="newHubName">
+          </div>
+         </div>
+        <br>
+        <div class="modal-footer">
+          <button type="button" onclick="myAdmin.newHub();" class="btn btn-primary" data-bs-dismiss="modal">Create</button>
         </div>
       </div>
     </div>

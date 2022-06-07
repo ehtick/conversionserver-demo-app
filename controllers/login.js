@@ -1,5 +1,6 @@
 const Users = require('../models/Users');
 const Projects = require('../models/Projects');
+const Hubs = require('../models/Hubs');
 const CsFiles = require('../models/csFiles');
 const bcrypt = require('bcrypt');
 const csmanager = require('../libs/csManager');
@@ -72,13 +73,17 @@ exports.checkLogin = async(req, res, next) => {
     if (req.session && req.session.user) {
         console.log(req.session.project);
         let projectid = null;
-        let projectname = null;
+        let hubid = null;
+        
         if (req.session.project)
         {
             projectid = req.session.project._id;
-            projectname = req.session.project.name;
         }
-        res.json({succeeded:true, user:req.session.user.email, project:projectid});
+        if (req.session.hub)
+        {
+            hubid = req.session.hub._id;
+        }
+        res.json({succeeded:true, user:req.session.user.email, project:projectid, hub:hubid});
     }
     else
         res.json({succeeded:false});
@@ -94,7 +99,8 @@ exports.putNewProject = async(req, res, next) => {
     console.log("new project");
     const project = new Projects({
         name: req.params.projectname,
-        user: req.session.user      
+        users: [{user:req.session.user, role:"Owner"}],
+        hub: req.session.hub   
     });
 
     await project.save();
@@ -144,10 +150,53 @@ exports.putProject = async(req, res, next) => {
 
 exports.getProjects = async(req, res, next) => {    
 
-    let projects = await Projects.find({ "user": req.session.user});
+    let projects = await Projects.find({ "users.user": req.session.user,"hub": req.session.hub } );
+   // let project = projects[0];
+    // project.users.push({user:req.session.user.id, role:"Owner"});
+    // await project.save();
+
     let a = [];
     for (let i = 0; i < projects.length; i++) {
         a.push({ id: projects[i].id.toString(), name: projects[i].name});
     }
     res.json(a);    
+};
+
+
+exports.getHubs = async(req, res, next) => {    
+
+    let hubs = await Hubs.find({ "users.user": req.session.user});
+
+    let a = [];
+    for (let i = 0; i < hubs.length; i++) {
+        a.push({ id: hubs[i].id.toString(), name: hubs[i].name});
+    }
+    res.json(a);    
+};
+
+
+exports.putNewHub = async(req, res, next) => {    
+    console.log("new hub");
+    const hub = new Hubs({
+        name: req.params.hubname,
+        users: [{user:req.session.user, role:"Owner"}],
+    });
+
+    await hub.save();
+    
+    res.json({hubid:hub.id});
+};
+
+
+exports.putHub = async(req, res, next) => {    
+
+    if (req.params.hubid != "none") {
+        var item = await Hubs.findOne({ "_id": req.params.hubid });
+        req.session.hub = item;
+        res.json({hubname:item.name});
+    }
+    else {
+        req.session.hub = null;
+        res.sendStatus(200);
+    }
 };
