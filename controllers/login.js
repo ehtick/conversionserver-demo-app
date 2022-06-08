@@ -175,6 +175,56 @@ exports.getHubs = async(req, res, next) => {
 };
 
 
+exports.getUsers = async(req, res, next) => {    
+
+    let users = await Users.find();
+
+    let a = [];
+    for (let i = 0; i < users.length; i++) {
+        a.push({ id: users[i].id.toString(), email: users[i].email});
+    }
+    res.json(a);    
+};
+
+
+exports.getHubUsers = async(req, res, next) => {    
+
+
+    var item = await Hubs.findOne({ "_id": req.params.hubid });
+    let hubusers = item.users;
+    let a = [];
+    for (let i = 0; i < hubusers.length; i++) {
+        a.push({ id: hubusers[i].user._id.toString(), role: hubusers[i].role});
+    }
+    res.json(a);    
+};
+
+
+exports.addHubUser = async(req, res, next) => {    
+
+
+    var item = await Hubs.findOne({ "_id": req.params.hubid });
+    let hubusers = item.users;
+    let a = [];
+    let alreadyAdded = false;
+    for (let i = 0; i < hubusers.length; i++) {
+        if (hubusers[i].user._id.toString() == req.params.userid)
+        {
+            alreadyAdded = true;
+            break;
+        }
+    }
+    if (!alreadyAdded) {
+        let user = await Users.findOne({ "_id":  req.params.userid });
+        hubusers.push({user:user, role:req.params.role});
+    }
+
+    await item.save();
+    
+    res.sendStatus(200); 
+};
+
+
 exports.putNewHub = async(req, res, next) => {    
     console.log("new hub");
     const hub = new Hubs({
