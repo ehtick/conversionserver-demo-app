@@ -161,7 +161,7 @@ class Admin {
         var users = await response.json();
         for (let i = 0; i < users.length; i++) {
 
-            let prop = { id: i, userid:users[i].id, email: this._userhash[users[i].id] };
+            let prop = { id: i, userid:users[i].id, email: this._userhash[users[i].id], role: users[i].role };
 
             this._hubusertable.addData([prop], false);
         }
@@ -194,7 +194,7 @@ class Admin {
                 if (!alreadyexists) {
                    
                     
-                    var res = await fetch(serveraddress + '/api/addHubUser/' + this.currentHub + "/" + userid + "/" + "Admin", { method: 'PUT' });
+                    var res = await fetch(serveraddress + '/api/addHubUser/' + this.currentHub + "/" + userid + "/" + tabdata[i].role, { method: 'PUT' });
                 }
 
             }
@@ -206,6 +206,8 @@ class Admin {
     async handleEditHubDialog() {
 
         this.currentHub = $("#hubselect").val();
+
+        $("#editHubName").val($("#hubselect option:selected").text());
         let myModal = new bootstrap.Modal(document.getElementById('edithubModal'));
         var response = await fetch(serveraddress + '/api/users');
         var users = await response.json();
@@ -225,9 +227,12 @@ class Admin {
                     title: "ID", field: "id", width: 60
                 },
                 {
-                    title: "userid", field: "userid", width: 60,visible:false,
+                    title: "userid", field: "userid",visible:false,
                 },
-                { title: "User", field: "email", editor: "select", editorParams: { values: userlist,placeholderEmpty:"No Results Found" } }
+                { title: "User", field: "email", editor: "select", editorParams: { values: userlist,placeholderEmpty:"No Results Found" } },
+                {
+                    title: "Role", field: "role", width: 90, editor: "select", editorParams: { values: ["Admin", "User"] }
+                },
 
             ],
         });
