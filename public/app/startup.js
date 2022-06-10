@@ -46,7 +46,7 @@ function setupApp() {
     {
       name: 'Switch Hub',
       fun: async function () {
-          myAdmin.handleHubSwitch();
+          myAdmin.adminHub.handleHubSwitch();
       }
     },    
     {

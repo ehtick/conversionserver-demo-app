@@ -488,12 +488,13 @@ height:100%;
 
 
 .loggedinuser {
-  right: 20px;
-  width: 200px;
+  right: 50px;
+  width: 300px;
   top: 5px;
   height: 20px;
   position: absolute;
   color: white;
+  text-align:right;
 }
 
 .projectname {

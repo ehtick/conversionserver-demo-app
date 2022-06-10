@@ -39,7 +39,7 @@ exports.postLogin = async(req, res, next) => {
         if (result)
         {       
             req.session.user = item; 
-            res.json({succeeded:true, user:req.session.user.email});
+            res.json({succeeded:true, user:{id:req.session.user._id,email:req.session.user.email}});
         }
         else
             res.json({succeeded:false});
@@ -73,7 +73,7 @@ exports.checkLogin = async(req, res, next) => {
     if (req.session && req.session.user) {
         console.log(req.session.project);
         let projectid = null;
-        let hubid = null;
+        let hubinfo = null;
         
         if (req.session.project)
         {
@@ -81,9 +81,9 @@ exports.checkLogin = async(req, res, next) => {
         }
         if (req.session.hub)
         {
-            hubid = req.session.hub._id;
+            hubinfo = {id:req.session.hub._id,name:req.session.hub.name}
         }
-        res.json({succeeded:true, user:req.session.user.email, project:projectid, hub:hubid});
+        res.json({succeeded:true, user:{id:req.session.user._id,email:req.session.user.email}, project:projectid, hub:hubinfo});
     }
     else
         res.json({succeeded:false});
@@ -243,7 +243,7 @@ exports.putHub = async(req, res, next) => {
     if (req.params.hubid != "none") {
         var item = await Hubs.findOne({ "_id": req.params.hubid });
         req.session.hub = item;
-        res.json({hubname:item.name});
+        res.json({id: req.params.hubid,name:item.name});
     }
     else {
         req.session.hub = null;

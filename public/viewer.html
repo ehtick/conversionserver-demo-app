@@ -17,7 +17,7 @@
   <script type="text/javascript" src="app/startup.js"></script>
   <script type="text/javascript" src="app/csManagerClient.js"></script>
   <script type="text/javascript" src="app/Admin.js"></script>
-    
+  <script type="text/javascript" src="app/AdminHub.js"></script> 
 
 
   <script type="text/javascript" src="app/mainUI.js"></script>
@@ -219,10 +219,10 @@
         </div>
         <br>
         <div class="modal-footer">
-          <button type="button" onclick="myAdmin.deleteHub();" class="btn btn-secondary">Delete</button>
-          <button type="button" onclick="myAdmin.handleNewHubDialog();" class="btn btn-secondary" data-bs-dismiss="modal">New</button>
-          <button type="button" onclick="myAdmin.handleEditHubDialog();" class="btn btn-secondary" data-bs-dismiss="modal">Edit</button>
-          <button type="button" onclick="myAdmin.loadHubFromDialog();" class="btn btn-primary" data-bs-dismiss="modal">Load</button>
+          <button type="button" onclick="myAdmin.adminHub.deleteHub();" class="btn btn-secondary">Delete</button>
+          <button type="button" onclick="myAdmin.adminHub.handleNewHubDialog();" class="btn btn-secondary" data-bs-dismiss="modal">New</button>
+          <button type="button" onclick="myAdmin.adminHub.handleEditHubDialog();" class="btn btn-secondary" data-bs-dismiss="modal">Edit</button>
+          <button type="button" onclick="myAdmin.adminHub.loadHubFromDialog();" class="btn btn-primary" data-bs-dismiss="modal">Load</button>
         </div>
       </div>
     </div>
@@ -265,13 +265,13 @@
             </div>      
             <label class="form-label">Users</label><br>
             <div id="hubuserstab"></div>
-            <button type="button"  onclick="myAdmin.addUserToHub();"
+            <button type="button"  onclick="myAdmin.adminHub.addUserToHub();"
             class="btn btn-primary" >Add</button>
           </div>
           <br>
           <div class="modal-footer">
             
-            <button type="button" id="newupdateanimationbutton" onclick="myAdmin.editHub();" class="btn btn-primary"
+            <button type="button" id="newupdateanimationbutton" onclick="myAdmin.adminHub.editHub();" class="btn btn-primary"
               data-bs-dismiss="modal">Update</button>
           </div>
         </div>
@@ -294,7 +294,7 @@
          </div>
         <br>
         <div class="modal-footer">
-          <button type="button" onclick="myAdmin.newHub();" class="btn btn-primary" data-bs-dismiss="modal">Create</button>
+          <button type="button" onclick="myAdmin.adminHub.newHub();" class="btn btn-primary" data-bs-dismiss="modal">Create</button>
         </div>
       </div>
     </div>

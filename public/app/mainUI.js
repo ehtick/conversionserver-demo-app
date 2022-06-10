@@ -53,7 +53,7 @@ class MainUI {
 
     updateMenu() {
         
-        if (!myAdmin.activeUser) {
+        if (!myAdmin.currentUser) {
             $("li:contains(Logout)").css("opacity", "0.2");
             $("li:contains(Logout)").css("pointer-events", "none");
 
@@ -72,7 +72,7 @@ class MainUI {
 
 
         }
-        if (myAdmin.activeUser) {
+        if (myAdmin.currentUser) {
 
             $("li:contains(Logout)").css("opacity", "1.0");
             $("li:contains(Logout)").css("pointer-events", "all");
