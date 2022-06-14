@@ -125,6 +125,13 @@ class AdminHub {
         await fetch(serveraddress + '/api/deleteHubUser/' + this.editHub.id + "/" + email, { method: 'PUT' });        
         this.refreshHubTable();
     }
+
+    async _acceptHubParticipation(event) {
+        let id = event.currentTarget.id.split("-")[1];
+        let email = this._hubusertable.getRow(id).getCell("email").getValue();
+        await fetch(serveraddress + '/api/acceptHub/' + this.editHub.id + "/" + email, { method: 'PUT' });        
+        this.refreshHubTable();
+    }
     
     _renderEditCell(cell) {
         let _this = this;
@@ -137,6 +144,8 @@ class AdminHub {
         if (rowdata.role == "Owner") {
             return;
         }
+
+        let accepted = rowdata.accepted;
 
         content += '<div style="height:20px">';
         
@@ -151,12 +160,27 @@ class AdminHub {
             content += '<button id="ehc_delete-' + cell.getData().id + '" type="button" class="edithubbuttons" ><i style="pointer-events:none" class="bx bx-trash"></i></button>';
 
         }
+
+        let hasAcceptButton = false;
+        if (!accepted && rowdata.email != "") {
+            if (rowdata.email == myAdmin.currentUser.email)
+            {
+                content += '<button id="ehc_accept2-' + cell.getData().id + '" type="button" class="edithubbuttons2" style="position:relative;top:-5px;border-style:none;height:20px"><span style="font-size:12px;top:-2px;position:relative;">Accept</span></button>';
+                hasAcceptButton = true;
+            }
+            else
+            {
+                content+='<span style="position:relative;top:-7px;left:5px">...Pending</span>';
+            }
+        }
+
         content += '</div>';
         $(cell.getElement()).append(content);
         $("#ehc_accept-" + cell.getData().id).on("click", function (event) { _this._acceptEdit(event); });
         $("#ehc_edit-" + cell.getData().id).on("click", function (event) { _this._enableEdit(event); });
          $("#ehc_cancel-" + cell.getData().id).on("click", function (event) { _this._discardEdit(event); });
          $("#ehc_delete-" + cell.getData().id).on("click", function (event) { _this._deleteUserFromHub(event); });
+         $("#ehc_accept2-" + cell.getData().id).on("click", function (event) { _this._acceptHubParticipation(event); });
         // this._updateCellStyle(cell.getData().id);        
     }
 
@@ -166,7 +190,7 @@ class AdminHub {
         var users = await response.json();
         for (let i = 0; i < users.length; i++) {
 
-            let prop = { id: i, email: users[i].email, role: users[i].role, edit:false };
+            let prop = { id: i, email: users[i].email, role: users[i].role, edit:false, accepted:users[i].accepted};
 
             this._hubusertable.addData([prop], false);
         }
@@ -191,13 +215,16 @@ class AdminHub {
                     title: "ID", field: "id", width: 60
                 },
                 {
+                    title: "accepted", field: "accepted", width: 60,visible:false
+                },
+                {
                     title: "", width: 150, field: "edit", formatter: function (cell, formatterParams, onRendered) {
                         onRendered(function () {
                             _this._renderEditCell(cell);
                         });
                     },
                 },              
-                { title: "User", field: "email", editor: "input", editable:this._editCheck, editorParams: { }},
+                { title: "User", field: "email", editor: "input", editable:this._editCheck, validator:"regex:[a-z0-9]+@[a-z]+\.[a-z]{2,3}", editorParams: { }},
                 {
                     title: "Role", field: "role", width: 90, editor: "select", editable:this._editCheck, editorParams: { values: ["Admin", "User"] }
                 },

@@ -526,6 +526,18 @@ font-size:25px;
   background:grey;
 }
 
+
+.edithubbuttons2 {
+ 
+  background:none;
+ 
+  
+}
+
+.edithubbuttons2:hover {
+  background:grey;
+}
+
 .tabulator-row-odd {
   background-color: #ffffff !important;
 }

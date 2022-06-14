@@ -24,6 +24,8 @@ exports.postRegister = async(req, res, next) => {
         res.json({succeeded:false});
 };
 
+
+
 exports.postLogin = async(req, res, next) => {    
     console.log("login");
 
@@ -149,7 +151,8 @@ exports.putProject = async(req, res, next) => {
 
 exports.getProjects = async(req, res, next) => {    
 
-    let projects = await Projects.find({ "users.email": req.session.user.email,"hub": req.session.hub } );
+ //   let projects = await Projects.find({ "users.email": req.session.user.email,"hub": req.session.hub } );
+    let projects = await Projects.find({ "hub": req.session.hub } );
   
     let a = [];
     for (let i = 0; i < projects.length; i++) {
@@ -190,7 +193,7 @@ exports.getHubUsers = async(req, res, next) => {
     let hubusers = item.users;
     let a = [];
     for (let i = 0; i < hubusers.length; i++) {
-        a.push({ email: hubusers[i].email, role: hubusers[i].role});
+        a.push({ email: hubusers[i].email, role: hubusers[i].role, accepted: hubusers[i].accepted});
     }
     res.json(a);    
 };
@@ -212,7 +215,22 @@ exports.addHubUser = async(req, res, next) => {
     }
     if (!alreadyAdded) {
         let user = await Users.findOne({ "email":  req.params.userid });
-        hubusers.push({email:user.email, role:req.params.role});
+        if (user)
+        {
+            hubusers.push({email:user.email, role:req.params.role, accepted:false});
+        }
+        else
+        {
+            let user = await Users.create({
+                firstName: "empty",
+                lastName: "empty",
+                email: req.params.userid,
+                password: "empty",
+                status: "NotJoined",        
+            });
+
+            hubusers.push({email:req.params.userid, role:req.params.role, accepted:false});
+        }
     }
 
     await item.save();
@@ -225,8 +243,7 @@ exports.deleteHubUser = async (req, res, next) => {
 
     var item = await Hubs.findOne({ "_id": req.params.hubid });
     let hubusers = item.users;
-    let a = [];
-    let alreadyAdded = false;
+  
     for (let i = 0; i < hubusers.length; i++) {
         if (hubusers[i].email == req.params.userid) {
             hubusers.splice(i, 1);
@@ -239,11 +256,31 @@ exports.deleteHubUser = async (req, res, next) => {
 };
 
 
+
+
+exports.acceptHub = async (req, res, next) => {
+
+    var item = await Hubs.findOne({ "_id": req.params.hubid });
+    let hubusers = item.users;
+   
+    for (let i = 0; i < hubusers.length; i++) {
+        if (hubusers[i].email == req.params.userid) {
+            hubusers[i].accepted = true;
+            break;           
+        }
+    }
+    await item.save();
+
+    res.sendStatus(200);
+};
+
+
+
 exports.putNewHub = async(req, res, next) => {    
     console.log("new hub");
     const hub = new Hubs({
         name: req.params.hubname,
-        users: [{email:req.session.user.email, role:"Owner"}],
+        users: [{email:req.session.user.email, role:"Owner", accepted:true}],
     });
 
     await hub.save();
