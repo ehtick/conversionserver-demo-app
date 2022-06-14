@@ -508,3 +508,27 @@ color: white;
 text-align: center;
 font-size:25px;
 }
+
+
+.edithubbuttons {
+  border-style:none;
+  background:none;
+  width:20px;
+  top:-3px;
+  position:relative;
+  padding-left:0px;
+  padding-right:0px;
+  zoom:1.3;
+  
+}
+
+.edithubbuttons:hover {
+  background:grey;
+}
+
+.tabulator-row-odd {
+  background-color: #ffffff !important;
+}
+.tabulator-row-even {
+  background-color: #ffffff !important;
+}

@@ -64,14 +64,101 @@ class AdminHub {
 
     }
 
+   
+
+
+
+
+    async _acceptEdit(event) {
+        let id = event.currentTarget.id.split("-")[1];
+        let email = this._hubusertable.getRow(id).getCell("email").getValue();
+        let role = this._hubusertable.getRow(id).getCell("role").getValue();
+
+
+        let response = await fetch(serveraddress + '/api/hubusers/' + this.editHub.id);
+        let hubusers = await response.json();
+
+        let isUser = false;
+        for (let i = 0; i < hubusers.length; i++) {
+            if (hubusers[i].email == email) {
+                isUser = true;
+                break;
+            }
+        }
+        if (!isUser) {
+            let res = await fetch(serveraddress + '/api/addHubUser/' + this.editHub.id + "/" + email + "/" +role, { method: 'PUT' });
+        }
+
+        this._hubusertable.getRow(id).getCell("edit").setValue(false);
+        this.refreshHubTable();
+    }
+
+    _editCheck(cell) {
+        let row = cell.getRow();
+        let data = row.getData();
+        return data.edit;
+    }
+
+
     addUserToHub()
     {
-        let prop = {id:this._hubusertable.getData().length, userid:"empty",email:"Select User"};
+        let prop = {id:this._hubusertable.getData().length,email:"", role:"User", edit:true};
 
         this._hubusertable.addData([prop], false);
         this._hubusertable.redraw();
     }
 
+    _enableEdit(event) {
+        let id = event.currentTarget.id.split("-")[1];
+        this._hubusertable.getRow(id).getCell("edit").setValue(true);
+    }
+
+    _discardEdit(event) {
+        let id = event.currentTarget.id.split("-")[1];
+        this._hubusertable.getRow(id).getCell("edit").setValue(false);
+        this.refreshHubTable();
+    }
+
+    async _deleteUserFromHub(event) {
+        let id = event.currentTarget.id.split("-")[1];
+        let email = this._hubusertable.getRow(id).getCell("email").getValue();
+        await fetch(serveraddress + '/api/deleteHubUser/' + this.editHub.id + "/" + email, { method: 'PUT' });        
+        this.refreshHubTable();
+    }
+    
+    _renderEditCell(cell) {
+        let _this = this;
+        
+        let content = "";
+        let editable = cell.getValue();
+
+        let rowdata = cell.getRow().getData();
+
+        if (rowdata.role == "Owner") {
+            return;
+        }
+
+        content += '<div style="height:20px">';
+        
+        if (editable)
+        {
+            content += '<button id="ehc_accept-' + cell.getData().id + '" type="button" class="edithubbuttons" ><i style="pointer-events:none" class="bx bx-check"></i></button>';
+            content += '<button id="ehc_cancel-' + cell.getData().id + '" type="button" class="edithubbuttons" ><i style="pointer-events:none" class="bx bx-x"></i></button>';
+        }
+        else
+        {
+            content += '<button id="ehc_edit-' + cell.getData().id + '" type="button" class="edithubbuttons" ><i style="pointer-events:none" class="bx bx-edit"></i></button>';
+            content += '<button id="ehc_delete-' + cell.getData().id + '" type="button" class="edithubbuttons" ><i style="pointer-events:none" class="bx bx-trash"></i></button>';
+
+        }
+        content += '</div>';
+        $(cell.getElement()).append(content);
+        $("#ehc_accept-" + cell.getData().id).on("click", function (event) { _this._acceptEdit(event); });
+        $("#ehc_edit-" + cell.getData().id).on("click", function (event) { _this._enableEdit(event); });
+         $("#ehc_cancel-" + cell.getData().id).on("click", function (event) { _this._discardEdit(event); });
+         $("#ehc_delete-" + cell.getData().id).on("click", function (event) { _this._deleteUserFromHub(event); });
+        // this._updateCellStyle(cell.getData().id);        
+    }
 
     async refreshHubTable() {
         this._hubusertable.clearData();
@@ -79,7 +166,7 @@ class AdminHub {
         var users = await response.json();
         for (let i = 0; i < users.length; i++) {
 
-            let prop = { id: i, userid:users[i].id, email: this._userhash[users[i].id], role: users[i].role };
+            let prop = { id: i, email: users[i].email, role: users[i].role, edit:false };
 
             this._hubusertable.addData([prop], false);
         }
@@ -88,66 +175,31 @@ class AdminHub {
 
     }
 
-    async editHub() {
-        let response = await fetch(serveraddress + '/api/hubusers/' + this.editHub.id);
-        let users = await response.json();
-
-        let tabdata = this._hubusertable.getData();
-        for (let i = 0; i < tabdata.length; i++) {
-            let userid = tabdata[i].email;
-            for (let k in this._userhash) {
-                if (this._userhash[k] == userid) {
-                    userid = k;
-                    break;
-                }
-            }
-            if (userid != "empty") {
-                let alreadyexists = false;
-                for (let j = 0; j < users.length; j++) {
-                    if (users[j].id == userid) {
-                        alreadyexists = true;
-                        break;
-                    }
-                }
-                if (!alreadyexists) {
-                   
-                    let res = await fetch(serveraddress + '/api/addHubUser/' + this.editHub.id + "/" + userid + "/" + tabdata[i].role, { method: 'PUT' });
-                }
-            }
-
-        }
-        this.handleHubSelection();
-    }
-
     async handleEditHubDialog() {
 
         this.editHub = {id:$("#hubselect").val(), name:$("#hubselect option:selected").text()};
 
         $("#editHubName").val(this.editHub.name);
         let myModal = new bootstrap.Modal(document.getElementById('edithubModal'));
-        var response = await fetch(serveraddress + '/api/users');
-        var users = await response.json();
-
-        let userlist = [];
-        this._userhash = [];
-        for (let i = 0; i < users.length; i++) {
-            userlist.push(users[i].email);
-            this._userhash[users[i].id] = users[i].email;
-        }
+    
         let _this = this;
         this._hubusertable = new Tabulator("#hubuserstab", {
             layout: "fitColumns",
-            selectable: 1,
+            selectable: 0,
             columns: [
                 {
                     title: "ID", field: "id", width: 60
                 },
                 {
-                    title: "userid", field: "userid",visible:false,
-                },
-                { title: "User", field: "email", editor: "select", editorParams: { values: userlist,placeholderEmpty:"No Results Found" } },
+                    title: "", width: 150, field: "edit", formatter: function (cell, formatterParams, onRendered) {
+                        onRendered(function () {
+                            _this._renderEditCell(cell);
+                        });
+                    },
+                },              
+                { title: "User", field: "email", editor: "input", editable:this._editCheck, editorParams: { }},
                 {
-                    title: "Role", field: "role", width: 90, editor: "select", editorParams: { values: ["Admin", "User"] }
+                    title: "Role", field: "role", width: 90, editor: "select", editable:this._editCheck, editorParams: { values: ["Admin", "User"] }
                 },
 
             ],

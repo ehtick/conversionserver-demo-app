@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const HubSchema = new Schema({ 
   name: { type: String, required: true},
-  users: [{user: {type: Schema.Types.ObjectId, ref: 'User'}, role: String}],  
+  users: [{email:String, role: String}],  
 });
 
 module.exports = mongoose.model('Hubs', HubSchema);

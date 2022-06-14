@@ -18,7 +18,7 @@ exports.postRegister = async(req, res, next) => {
 
         let user = await Users.create(data);
         req.session.user = user;
-        res.json({succeeded:true, user:req.session.user});
+        res.json({succeeded:true, user:req.session.user.email});
     }
     else 
         res.json({succeeded:false});
@@ -39,7 +39,7 @@ exports.postLogin = async(req, res, next) => {
         if (result)
         {       
             req.session.user = item; 
-            res.json({succeeded:true, user:{id:req.session.user._id,email:req.session.user.email}});
+            res.json({succeeded:true, user:{email:req.session.user.email}});
         }
         else
             res.json({succeeded:false});
@@ -63,11 +63,10 @@ exports.checkLogin = async(req, res, next) => {
             var project = await Projects.findOne({ "user": item.id, "name": "Demo Project" });
             if (project)
             {
-                req.session.user = item;
+                req.session.user = {email:req.session.user.email};
                 req.session.project = project;
             }
         }
-
     }
 
     if (req.session && req.session.user) {
@@ -81,9 +80,9 @@ exports.checkLogin = async(req, res, next) => {
         }
         if (req.session.hub)
         {
-            hubinfo = {id:req.session.hub._id,name:req.session.hub.name}
+            hubinfo = {id:req.session.hub._id,name:req.session.hub.name};
         }
-        res.json({succeeded:true, user:{id:req.session.user._id,email:req.session.user.email}, project:projectid, hub:hubinfo});
+        res.json({succeeded:true, user:{email:req.session.user.email}, project:projectid, hub:hubinfo});
     }
     else
         res.json({succeeded:false});
@@ -99,7 +98,7 @@ exports.putNewProject = async(req, res, next) => {
     console.log("new project");
     const project = new Projects({
         name: req.params.projectname,
-        users: [{user:req.session.user, role:"Owner"}],
+        users: [{user:req.session.user.email, role:"Owner"}],
         hub: req.session.hub   
     });
 
@@ -150,11 +149,8 @@ exports.putProject = async(req, res, next) => {
 
 exports.getProjects = async(req, res, next) => {    
 
-    let projects = await Projects.find({ "users.user": req.session.user,"hub": req.session.hub } );
-   // let project = projects[0];
-    // project.users.push({user:req.session.user.id, role:"Owner"});
-    // await project.save();
-
+    let projects = await Projects.find({ "users.email": req.session.user.email,"hub": req.session.hub } );
+  
     let a = [];
     for (let i = 0; i < projects.length; i++) {
         a.push({ id: projects[i].id.toString(), name: projects[i].name});
@@ -165,7 +161,7 @@ exports.getProjects = async(req, res, next) => {
 
 exports.getHubs = async(req, res, next) => {    
 
-    let hubs = await Hubs.find({ "users.user": req.session.user});
+    let hubs = await Hubs.find({ "users.email": req.session.user.email});
 
     let a = [];
     for (let i = 0; i < hubs.length; i++) {
@@ -181,7 +177,7 @@ exports.getUsers = async(req, res, next) => {
 
     let a = [];
     for (let i = 0; i < users.length; i++) {
-        a.push({ id: users[i].id.toString(), email: users[i].email});
+        a.push(users[i].email);
     }
     res.json(a);    
 };
@@ -194,7 +190,7 @@ exports.getHubUsers = async(req, res, next) => {
     let hubusers = item.users;
     let a = [];
     for (let i = 0; i < hubusers.length; i++) {
-        a.push({ id: hubusers[i].user._id.toString(), role: hubusers[i].role});
+        a.push({ email: hubusers[i].email, role: hubusers[i].role});
     }
     res.json(a);    
 };
@@ -208,15 +204,15 @@ exports.addHubUser = async(req, res, next) => {
     let a = [];
     let alreadyAdded = false;
     for (let i = 0; i < hubusers.length; i++) {
-        if (hubusers[i].user._id.toString() == req.params.userid)
+        if (hubusers[i].email == req.params.userid)
         {
             alreadyAdded = true;
             break;
         }
     }
     if (!alreadyAdded) {
-        let user = await Users.findOne({ "_id":  req.params.userid });
-        hubusers.push({user:user, role:req.params.role});
+        let user = await Users.findOne({ "email":  req.params.userid });
+        hubusers.push({email:user.email, role:req.params.role});
     }
 
     await item.save();
@@ -225,11 +221,29 @@ exports.addHubUser = async(req, res, next) => {
 };
 
 
+exports.deleteHubUser = async (req, res, next) => {
+
+    var item = await Hubs.findOne({ "_id": req.params.hubid });
+    let hubusers = item.users;
+    let a = [];
+    let alreadyAdded = false;
+    for (let i = 0; i < hubusers.length; i++) {
+        if (hubusers[i].email == req.params.userid) {
+            hubusers.splice(i, 1);
+            break;
+        }
+    }
+    await item.save();
+
+    res.sendStatus(200);
+};
+
+
 exports.putNewHub = async(req, res, next) => {    
     console.log("new hub");
     const hub = new Hubs({
         name: req.params.hubname,
-        users: [{user:req.session.user, role:"Owner"}],
+        users: [{email:req.session.user.email, role:"Owner"}],
     });
 
     await hub.save();
