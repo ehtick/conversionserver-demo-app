@@ -29,6 +29,7 @@ router.get('/hubs', loginController.getHubs);
 router.get('/hubusers/:hubid', loginController.getHubUsers);
 router.put('/addHubUser/:hubid/:userid/:role', loginController.addHubUser);
 router.put('/deleteHubUser/:hubid/:userid', loginController.deleteHubUser);
+router.put('/deleteHub/:hubid', loginController.putDeleteHub);
 router.put('/newhub/:hubname', loginController.putNewHub);
 router.put('/acceptHub/:hubid/:userid', loginController.acceptHub);
 

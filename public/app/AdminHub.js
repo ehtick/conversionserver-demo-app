@@ -126,6 +126,14 @@ class AdminHub {
         this.refreshHubTable();
     }
 
+    async deleteHub() {
+        $('#choosehubModal').modal('hide');
+
+       var res = await fetch(serveraddress + '/api/deleteHub/' + $("#hubselect").val(), { method: 'PUT' });
+       this.handleHubSelection();
+   }
+
+
     async _acceptHubParticipation(event) {
         let id = event.currentTarget.id.split("-")[1];
         let email = this._hubusertable.getRow(id).getCell("email").getValue();

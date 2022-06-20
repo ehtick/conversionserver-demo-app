@@ -4,7 +4,7 @@ class Admin {
         this.currentUser = null;
         this.currentProject = null;
         this.currentHub = null;
-        this.demoMode = false;
+        this.demoMode = "off";
         this.useDirectFetch = false;
         this._newProjectCallback = null;
         this._updateUICallback = null;
