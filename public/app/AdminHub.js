@@ -86,7 +86,7 @@ class AdminHub {
             }
         }
         if (!isUser) {
-            let res = await fetch(serveraddress + '/api/addHubUser/' + this.editHub.id + "/" + email + "/" +role, { method: 'PUT' });
+            let res = await fetch(serveraddress + '/api/addHubUser/' + this.editHub.id + "/" + email + "/" + role, { method: 'PUT' });
         }
 
         this._hubusertable.getRow(id).getCell("edit").setValue(false);

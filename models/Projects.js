@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const ProjectSchema = new Schema({ 
   name: { type: String, required: true},
-  users: [{email:String, role: String}],
+  users: [{email:String, role: Number}],
   hub: { type: Schema.Types.ObjectId, ref: 'Hub'}
 }, {timestamps:true});
 
