@@ -4,6 +4,6 @@
     "conversionServiceURI": "http://localhost:3001",
     "useCSAPI": false,
     "useDirectFetch": false,
-    "demoMode": false
+    "demoMode": "on"
   }
 }

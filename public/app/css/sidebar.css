@@ -489,7 +489,7 @@ height:100%;
 
 .loggedinuser {
   right: 50px;
-  width: 300px;
+  width: 400px;
   top: 5px;
   height: 20px;
   position: absolute;
@@ -540,7 +540,9 @@ font-size:25px;
 
 .tabulator-row-odd {
   background-color: #ffffff !important;
+  border-bottom: 1px solid #ddd;
 }
 .tabulator-row-even {
   background-color: #ffffff !important;
+  border-bottom: 1px solid #ddd;
 }

@@ -7,12 +7,15 @@ const csmanager = require('../libs/csManager');
 let mongoose = require('mongoose'); 
 const config = require('config');
 
+//var nodemailer = require('nodemailer');
+
 exports.postRegister = async(req, res, next) => {
     console.log("Registration");
 
     let item = await Users.findOne({ "email":  req.body.email });
     if (!item) 
     {
+
         data = req.body;
         data.password = await bcrypt.hash(data.password,10);
 
@@ -56,17 +59,20 @@ exports.configuration = async(req, res, next) => {
 
 
 
-exports.checkLogin = async(req, res, next) => {    
+exports.checkLogin = async (req, res, next) => {
     console.log("check login");
-    if (config.get('app.demoMode')) {
-        let item = await Users.findOne({ "email":  "guido@techsoft3d.com" });
-        if (item)
-        {
-            var project = await Projects.findOne({ "user": item.id, "name": "Demo Project" });
-            if (project)
-            {
-                req.session.user = {email:req.session.user.email};
-                req.session.project = project;
+    if (config.get('app.demoMode') != "off") {
+        let item = await Users.findOne({ "email": "demouser@techsoft3d.com" });
+        if (item) {
+            let hub = await Hubs.findOne({ "name": "Demo Hub", "users.email": item.email });
+            if (hub) {
+                let project = await Projects.findOne({ "users.email": item.email, "name": "Demo Project","hub": hub.id });
+
+                if (project) {
+                    req.session.user = item;
+                    req.session.project = project;
+                    req.session.hub = hub;
+                }
             }
         }
     }
@@ -75,19 +81,17 @@ exports.checkLogin = async(req, res, next) => {
         console.log(req.session.project);
         let projectid = null;
         let hubinfo = null;
-        
-        if (req.session.project)
-        {
+
+        if (req.session.project) {
             projectid = req.session.project._id;
         }
-        if (req.session.hub)
-        {
-            hubinfo = {id:req.session.hub._id,name:req.session.hub.name};
+        if (req.session.hub) {
+            hubinfo = { id: req.session.hub._id, name: req.session.hub.name };
         }
-        res.json({succeeded:true, user:{email:req.session.user.email}, project:projectid, hub:hubinfo});
+        res.json({ succeeded: true, user: { email: req.session.user.email }, project: projectid, hub: hubinfo });
     }
     else
-        res.json({succeeded:false});
+        res.json({ succeeded: false });
 };
 
 exports.putLogout = async(req, res, next) => {    
@@ -100,7 +104,7 @@ exports.putNewProject = async(req, res, next) => {
     console.log("new project");
     const project = new Projects({
         name: req.params.projectname,
-        users: [{user:req.session.user.email, role:"Owner"}],
+        users: [{email:req.session.user.email, role:"Owner"}],
         hub: req.session.hub   
     });
 
@@ -221,15 +225,16 @@ exports.addHubUser = async(req, res, next) => {
         }
         else
         {
-            let user = await Users.create({
-                firstName: "empty",
-                lastName: "empty",
-                email: req.params.userid,
-                password: "empty",
-                status: "NotJoined",        
-            });
+            //TODO: Implement email invite for new users
+            // let user = await Users.create({
+            //     firstName: "empty",
+            //     lastName: "empty",
+            //     email: req.params.userid,
+            //     password: "empty",
+            //     status: "NotJoined",        
+            // });
 
-            hubusers.push({email:req.params.userid, role:req.params.role, accepted:false});
+            // hubusers.push({email:req.params.userid, role:req.params.role, accepted:false});
         }
     }
 
