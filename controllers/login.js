@@ -28,6 +28,11 @@ exports.postRegister = async(req, res, next) => {
             let hub = await Hubs.findOne({ "name": "Demo Hub" });
             if (hub) {
                 await addOneHubUser(hub.id,user.email,2, true);
+                let project = await Projects.findOne({ "name": "Demo Project" });
+                if (project) {
+                    await addOneProjectUser(project.id,user.email,2);
+                }
+
             }
         }
         res.json({succeeded:true, user:req.session.user.email});
@@ -75,7 +80,7 @@ exports.checkLogin = async (req, res, next) => {
         if (item) {
             let hub = await Hubs.findOne({ "name": "Demo Hub", "users.email": item.email });
             if (hub) {
-                let project = await Projects.findOne({ "users.email": item.email, "name": "Demo Project","hub": hub.id });
+                let project = await Projects.findOne({ "users.email": item.email, "name": "Demo Project", "hub": hub.id });
 
                 if (project) {
                     req.session.user = item;
@@ -91,28 +96,35 @@ exports.checkLogin = async (req, res, next) => {
         let projectid = null;
         let hubinfo = null;
 
+        let item = await Users.findOne({ "email": req.session.user.email });
+        if (!item) {
+            req.session.destroy();
+            res.json({ succeeded: false });
 
+        }
+        else {
 
-        if (req.session.hub) {
-            hubinfo = { id: req.session.hub._id, name: req.session.hub.name };
-        }
+            if (req.session.hub) {
+                hubinfo = { id: req.session.hub._id, name: req.session.hub.name };
+            }
 
-        if (req.session.project) {
-            projectid = req.session.project._id;
+            if (req.session.project) {
+                projectid = req.session.project._id;
+            }
+            if (req.session.hub) {
+                hubinfo = { id: req.session.hub._id, name: req.session.hub.name };
+            }
+            res.json({ succeeded: true, user: { email: req.session.user.email }, project: projectid, hub: hubinfo });
         }
-        if (req.session.hub) {
-            hubinfo = { id: req.session.hub._id, name: req.session.hub.name };
-        }
-        res.json({ succeeded: true, user: { email: req.session.user.email }, project: projectid, hub: hubinfo });
     }
     else
         res.json({ succeeded: false });
 };
 
-exports.putLogout = async(req, res, next) => {    
+exports.putLogout = async (req, res, next) => {
     console.log("logout");
     req.session.destroy();
-    res.json({succeeded:true});
+    res.json({ succeeded: true });
 };
 
 exports.putNewProject = async (req, res, next) => {
@@ -310,19 +322,21 @@ exports.addProjectUser = async (req, res, next) => {
 };
 
 
+async function deleteOneProjectUser(projectid, email) {
+    var item = await Projects.findOne({ "_id": projectid });
+    let projectusers = item.users;
+
+    for (let i = 0; i < projectusers.length; i++) {
+        if (projectusers[i].email == email) {
+            projectusers.splice(i, 1);
+            break;
+        }
+    }
+    await item.save();
+}
 exports.deleteProjectUser = async (req, res, next) => {
     if (await checkHubAuthorized(req.session.user.email,req.session.hub._id.toString(),1)) {
-
-        var item = await Projects.findOne({ "_id": req.params.projectid });
-        let projectusers = item.users;
-
-        for (let i = 0; i < projectusers.length; i++) {
-            if (projectusers[i].email == req.params.userid) {
-                projectusers.splice(i, 1);
-                break;
-            }
-        }
-        await item.save();
+        await deleteOneProjectUser(req.params.projectid, req.params.userid);     
     }
 
     res.sendStatus(200);
@@ -415,6 +429,13 @@ exports.deleteHubUser = async (req, res, next) => {
         for (let i = 0; i < hubusers.length; i++) {
             if (hubusers[i].email == req.params.userid) {
                 hubusers.splice(i, 1);
+
+                let projects = await Projects.find({"hub": req.params.hubid });
+
+                for (let i=0;i<projects.length;i++)
+                {
+                    await deleteOneProjectUser(projects[i].id, req.params.userid);
+                }
                 break;
             }
         }
