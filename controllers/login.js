@@ -91,6 +91,12 @@ exports.checkLogin = async (req, res, next) => {
         let projectid = null;
         let hubinfo = null;
 
+
+
+        if (req.session.hub) {
+            hubinfo = { id: req.session.hub._id, name: req.session.hub.name };
+        }
+
         if (req.session.project) {
             projectid = req.session.project._id;
         }
@@ -122,24 +128,23 @@ exports.putNewProject = async(req, res, next) => {
     res.json({projectid:project.id});
 };
 
-exports.putDeleteProject = async(req, res, next) => {    
-    let project = await Projects.findOne({ "_id": req.params.projectid, "users.email": req.session.user.email });
+
+async function deleteOneProject(projectid, req) {
+    let project = await Projects.findOne({ "_id": projectid, "users": { $elemMatch: { "email": req.session.user.email, "role": { $lte: 1 } } } });
 
     if (project) {
-        for (let i = 0; i < project.users.length; i++) {
-            if (project.users[i].email == req.session.user.email) {
-                if (project.users[i].role <= 1) {
-                    
-                    let models = await CsFiles.find({project:req.params.projectid});
-                    for (let i = 0; i < models.length; i++) {
-                        await csmanager.deleteModel(models[i]._id.toString());        
-                    }
-                    await Projects.deleteOne({ "_id": req.params.projectid });
-                }
-
-            }
+        let models = await CsFiles.find({ project: projectid });
+        for (let i = 0; i < models.length; i++) {
+            await csmanager.deleteModel(models[i]._id.toString());
         }
+        await Projects.deleteOne({ "_id": projectid });
     }
+
+}
+
+exports.putDeleteProject = async(req, res, next) => {    
+
+    await deleteOneProject(req.params.projectid, req);
 
     res.sendStatus(200);   
 };
@@ -232,6 +237,73 @@ exports.getHubUsers = async(req, res, next) => {
 
 
 
+exports.getProjectUsers = async(req, res, next) => {    
+
+
+    var item = await Projects.findOne({ "_id": req.params.projectid });
+    let projectusers = item.users;
+    let a = [];
+    for (let i = 0; i < projectusers.length; i++) {
+        let role = "";
+        switch (projectusers[i].role)
+        {
+            case 0:
+            role = "Owner";
+            break;
+            case 1:
+            role = "Editor";
+            break;
+            default:
+            role = "Viewer";
+            break;
+
+        }
+        a.push({ email: projectusers[i].email, role: role});
+    }
+    res.json(a);    
+};
+
+
+
+
+async function addOneProjectUser(projectid, email, role) {
+    let item = await Projects.findOne({ "_id": projectid });
+    let projectusers = item.users;
+    let a = [];
+    let alreadyAdded = false;
+    for (let i = 0; i < projectusers.length; i++) {
+        if (projectusers[i].email == email) {
+            alreadyAdded = true;
+            break;
+        }
+    }
+    if (!alreadyAdded) {
+        let user = await Users.findOne({ "email": email });
+        if (user) {
+            projectusers.push({ email: user.email, role: role});
+        }       
+    }
+    await item.save();
+
+}
+
+exports.addProjectUser = async (req, res, next) => {
+
+    if (await checkHubAuthorized(req.session.user.email,req.session.hub._id.toString(),1)) {
+        let role = 2;
+        if (req.params.role == "Editor")
+        {
+            role = 1;
+        }
+
+        await addOneProjectUser(req.params.projectid, req.params.userid, role);
+    }
+
+    res.sendStatus(200);
+};
+
+
+
 async function addOneHubUser(hubid, email, role,accepted) {
     let item = await Hubs.findOne({ "_id": hubid });
     let hubusers = item.users;
@@ -302,15 +374,35 @@ exports.deleteHubUser = async (req, res, next) => {
 };
 
 
-async function checkHubAuthorized(email,hubid, role) {
-    let hub = await Hubs.findOne({ "_id": hubid, "users.email": email });
-    if (hub) {
-        let hubusers = hub.users;
+exports.updateHubUser = async (req, res, next) => {
+    if (await checkHubAuthorized(req.session.user.email,req.params.hubid,1)) {
+
+        var item = await Hubs.findOne({ "_id": req.params.hubid });
+        let hubusers = item.users;
+
         for (let i = 0; i < hubusers.length; i++) {
-            if (hubusers[i].email == email && hubusers[i].role <= role) {
-                return true;
+            if (hubusers[i].email == req.params.userid) {
+                let role = 2;
+                if (req.params.role == "Admin")
+                {
+                    role = 1;
+                }
+                hubusers[i].role = role;
+                break;
             }
         }
+        await item.save();
+    }
+
+    res.sendStatus(200);
+};
+
+
+async function checkHubAuthorized(email,hubid, role) {
+    let hub = await Hubs.findOne({ "_id": hubid, "users": { $elemMatch: { "email": email, "role": { $lte: role } } } });
+
+    if (hub) {
+        return true;
     }
     return false;
 
@@ -319,19 +411,18 @@ async function checkHubAuthorized(email,hubid, role) {
 
 
 exports.putDeleteHub = async (req, res, next) => {
-    let hub = await Hubs.findOne({ "_id": req.params.hubid, "users.email": req.session.user.email });
+    let hub = await Hubs.findOne({ "_id": req.params.hubid, "users": { $elemMatch: { "email": req.session.user.email, "role": { $lt: 1 } } } });
 
     if (hub) {
-        for (let i = 0; i < hub.users.length; i++) {
-            if (hub.users[i].email == req.session.user.email) {
-                if (hub.users[i].role == 0) {
-                    await Hubs.deleteOne({ "_id": req.params.hubid });
-                }
 
-            }
+        let projects = await Projects.find({"hub": req.params.hubid });
+        for (let i = 0; i < projects.length; i++) {
+            await deleteOneProject(projects[i].id,req);
+
         }
-    }
 
+        await Hubs.deleteOne({ "_id": req.params.hubid });
+    }
     res.sendStatus(200);
 };
 

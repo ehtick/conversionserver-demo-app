@@ -18,6 +18,7 @@
   <script type="text/javascript" src="app/csManagerClient.js"></script>
   <script type="text/javascript" src="app/Admin.js"></script>
   <script type="text/javascript" src="app/AdminHub.js"></script> 
+  <script type="text/javascript" src="app/AdminProject.js"></script> 
 
 
   <script type="text/javascript" src="app/mainUI.js"></script>
@@ -193,14 +194,43 @@
         </div>
         <br>
         <div class="modal-footer">
-          <button type="button" onclick="myAdmin.deleteProject();" class="btn btn-secondary">Delete</button>
-          <button type="button" onclick="myAdmin.handleNewProjectDialog();" class="btn btn-secondary" data-bs-dismiss="modal">New</button>
-          <button type="button" onclick="myAdmin.handleRenameProjectDialog();" class="btn btn-secondary" data-bs-dismiss="modal">Rename</button>
-          <button type="button" onclick="myAdmin.loadProjectFromDialog();" class="btn btn-primary" data-bs-dismiss="modal">Load</button>
+          <button type="button" onclick="myAdmin.adminProject.deleteProject();" class="btn btn-secondary">Delete</button>
+          <button type="button" onclick="myAdmin.adminProject.handleNewProjectDialog();" class="btn btn-secondary" data-bs-dismiss="modal">New</button>
+          <button type="button" onclick="myAdmin.adminProject.handleEditProjectDialog();" class="btn btn-secondary" data-bs-dismiss="modal">Edit</button>
+          <button type="button" onclick="myAdmin.adminProject.loadProjectFromDialog();" class="btn btn-primary" data-bs-dismiss="modal">Load</button>
         </div>
       </div>
     </div>
   </div>
+
+  <div class="modal fade" id="editProjectModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Edit Project</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="editProjectName" class="form-label">Name</label>
+          <input type="text" class="form-control" id="editProjectName" value="">
+        </div>      
+        <label class="form-label">Users</label><br>
+        <div id="projectuserstab"></div>
+        <button type="button" style="margin-top:5px" onclick="myAdmin.adminProject.addUserToProject();"
+        class="btn btn-secondary" >Add User</button>
+      </div>
+      <br>
+      <div class="modal-footer">
+        
+        <button type="button" id="" class="btn btn-primary"
+          data-bs-dismiss="modal">Dismiss</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
   <div class="modal fade" id="choosehubModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -244,7 +274,7 @@
          </div>
         <br>
         <div class="modal-footer">
-          <button type="button" onclick="myAdmin.newProject();" class="btn btn-primary" data-bs-dismiss="modal">Create</button>
+          <button type="button" onclick="myAdmin.adminProject.newProject();" class="btn btn-primary" data-bs-dismiss="modal">Create</button>
         </div>
       </div>
     </div>
@@ -301,6 +331,9 @@
   </div>
   
   
+
+
+
 <div class="modal fade" id="renameprojectModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -316,7 +349,7 @@
        </div>
       <br>
       <div class="modal-footer">
-        <button type="button" onclick="myAdmin.renameProject();" class="btn btn-primary" data-bs-dismiss="modal">Rename</button>
+        <button type="button" onclick="myAdmin.adminProject.renameProject();" class="btn btn-primary" data-bs-dismiss="modal">Rename</button>
       </div>
     </div>
   </div>

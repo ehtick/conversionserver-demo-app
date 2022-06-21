@@ -23,12 +23,15 @@ router.put('/deleteproject/:projectid', loginController.putDeleteProject);
 router.put('/renameproject/:projectid/:newname', loginController.putRenameProject);
 router.put('/project/:projectid', loginController.putProject);
 router.get('/projects', loginController.getProjects);
+router.get('/projectusers/:projectid', loginController.getProjectUsers);
+router.put('/addProjectUser/:projectid/:userid/:role', loginController.addProjectUser);
 
 router.put('/hub/:hubid', loginController.putHub);
 router.get('/hubs', loginController.getHubs);
 router.get('/hubusers/:hubid', loginController.getHubUsers);
 router.put('/addHubUser/:hubid/:userid/:role', loginController.addHubUser);
 router.put('/deleteHubUser/:hubid/:userid', loginController.deleteHubUser);
+router.put('/updateHubUser/:hubid/:userid/:role', loginController.updateHubUser);
 router.put('/deleteHub/:hubid', loginController.putDeleteHub);
 router.put('/newhub/:hubname', loginController.putNewHub);
 router.put('/acceptHub/:hubid/:userid', loginController.acceptHub);

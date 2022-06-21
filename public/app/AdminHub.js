@@ -2,7 +2,6 @@ class AdminHub {
 
     constructor() {
    
-        this._userhash = [];
         this._hubusertable = null;
        
 
@@ -59,7 +58,7 @@ class AdminHub {
         $(".loggedinuser").html(myAdmin.currentUser.email + " - Hub:" + data.name);
            
         myAdmin._updateUI();
-        myAdmin.handleProjectSelection();
+        myAdmin.adminProject.handleProjectSelection();
   
 
     }
@@ -87,6 +86,10 @@ class AdminHub {
         }
         if (!isUser) {
             let res = await fetch(serveraddress + '/api/addHubUser/' + this.editHub.id + "/" + email + "/" + role, { method: 'PUT' });
+        }
+        else
+        {
+            let res = await fetch(serveraddress + '/api/updateHubUser/' + this.editHub.id + "/" + email + "/" + role, { method: 'PUT' });
         }
 
         this._hubusertable.getRow(id).getCell("edit").setValue(false);
@@ -244,13 +247,6 @@ class AdminHub {
             _this.refreshHubTable();
         });
 
-        this._hubusertable.on("cellEdited", function (cell) {
-            // let data = cell.getRow().getData();
-            // let i = data.animation.split(":")[0];
-            // currentAnimationGroup.getAnimations()[data.id].animation = currentAnimationList[i].animation;
-            // currentAnimationGroup.getAnimations()[data.id].component = currentAnimationList[i].component;
-
-        });
 
         myModal.toggle();
     }

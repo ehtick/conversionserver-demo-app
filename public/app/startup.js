@@ -52,7 +52,7 @@ function setupApp() {
     {
       name: 'Switch Project',
       fun: async function () {
-          myAdmin.handleProjectSwitch();
+          myAdmin.adminProject.handleProjectSwitch();
       }
     },    
     {

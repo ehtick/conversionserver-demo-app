@@ -6,18 +6,15 @@ class Admin {
         this.currentHub = null;
         this.demoMode = "off";
         this.useDirectFetch = false;
-        this._newProjectCallback = null;
+    
         this._updateUICallback = null;
      
         this.adminHub = new AdminHub();
+        this.adminProject = new AdminProject();
 
     }
 
-    setNewProjectCallback(newprojectcallback)
-    {
-        this._newProjectCallback = newprojectcallback;
-    }
-
+ 
     setUpdateUICallback(updateuicallback)
     {
         this._updateUICallback = updateuicallback;
@@ -66,11 +63,11 @@ class Admin {
 
                 this.currentHub = data.hub;
                 this.currentProject = null;
-                this.handleProjectSelection();
+                this.adminProject.handleProjectSelection();
             }
             else {
                 this.currentHub = data.hub;
-                this.loadProject(data.project);
+                this.adminProject.loadProject(data.project);
             }
         }
         this._updateUI();
@@ -83,81 +80,7 @@ class Admin {
 
     }
 
-    async handleProjectSwitch()
-    {
-        await fetch(serveraddress + '/api/project/none', { method: 'PUT' });
-        window.location.reload(true); 
-
-    }
-
-    
-    handleNewProjectDialog() {
-        let myModal = new bootstrap.Modal(document.getElementById('newprojectModal'));
-        myModal.toggle();
-    }
-
-
-    handleRenameProjectDialog() {
-        this.currentProject = $("#projectselect").val();
-        let myModal = new bootstrap.Modal(document.getElementById('renameprojectModal'));
-        myModal.toggle();
-    }
-
-
-    async renameProject() {
-        var res = await fetch(serveraddress + '/api/renameproject/' + this.currentProject + "/" +  $("#renamedProjectName").val(), { method: 'PUT' });
-        this.handleProjectSelection();
-    }
-
-    async newProject() {
-        var res = await fetch(serveraddress + '/api/newproject/' + $("#newProjectName").val(), { method: 'PUT' });
-        var data = await res.json();
-        this.loadProject(data.projectid);
-    }
-
-
-    async deleteProject() {
-         $('#chooseprojectModal').modal('hide');
-
-        var res = await fetch(serveraddress + '/api/deleteproject/' + $("#projectselect").val(), { method: 'PUT' });
-        this.handleProjectSelection();
-    }
-
-    async loadProject(projectid) {
-       
-        var res = await fetch(serveraddress + '/api/project/' + projectid, { method: 'PUT' });
-        $(".projectname").empty();
-        var data = await res.json();
-        $(".projectname").append(data.projectname);  
-
-        this.currentProject = data.projectname;              
-        this._updateUI();
-        $(".modal-backdrop").remove();
-        CsManagerClient.msready();
-
-    }
-
-    async loadProjectFromDialog() {
-        await this.loadProject($("#projectselect").val());
-    }
-
-    async handleProjectSelection() {
-      
-        let myModal = new bootstrap.Modal(document.getElementById('chooseprojectModal'));
-        myModal.toggle();
-        var response = await fetch(serveraddress + '/api/projects');
-        var models = await response.json();
-
-        $("#projectselect").empty();
-        var html = "";
-        for (var i = 0; i < models.length; i++) {
-            let cm = models[i];
-            html += '<option value="' + cm.id + '">' + cm.name + '</option>';
-        }
-        $("#projectselect").append(html);
-
-    }
-
+  
     handleRegistration()
     {
         let myModal = new bootstrap.Modal(document.getElementById('registerusermodal'));
