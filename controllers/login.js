@@ -115,17 +115,24 @@ exports.putLogout = async(req, res, next) => {
     res.json({succeeded:true});
 };
 
-exports.putNewProject = async(req, res, next) => {    
-    console.log("new project");
-    const project = new Projects({
-        name: req.params.projectname,
-        users: [{email:req.session.user.email, role:0}],
-        hub: req.session.hub   
-    });
+exports.putNewProject = async (req, res, next) => {
+    if (await checkHubAuthorized(req.session.user.email, req.session.hub._id.toString(), 1)) {
 
-    await project.save();
-    
-    res.json({projectid:project.id});
+        console.log("new project");
+        const project = new Projects({
+            name: req.params.projectname,
+            users: [{ email: req.session.user.email, role: 0 }],
+            hub: req.session.hub
+        });
+
+        await project.save();
+
+        res.json({ projectid: project.id });
+    }
+    else
+    {
+        res.sendStatus(200);       
+    }
 };
 
 
@@ -175,7 +182,7 @@ exports.putProject = async(req, res, next) => {
 exports.getProjects = async(req, res, next) => {    
 
  //   let projects = await Projects.find({ "users.email": req.session.user.email,"hub": req.session.hub } );
-    let projects = await Projects.find({ "hub": req.session.hub } );
+    let projects = await Projects.find({ "hub": req.session.hub,"users.email": req.session.user.email} );
   
     let a = [];
     for (let i = 0; i < projects.length; i++) {
@@ -297,6 +304,50 @@ exports.addProjectUser = async (req, res, next) => {
         }
 
         await addOneProjectUser(req.params.projectid, req.params.userid, role);
+    }
+
+    res.sendStatus(200);
+};
+
+
+exports.deleteProjectUser = async (req, res, next) => {
+    if (await checkHubAuthorized(req.session.user.email,req.session.hub._id.toString(),1)) {
+
+        var item = await Projects.findOne({ "_id": req.params.projectid });
+        let projectusers = item.users;
+
+        for (let i = 0; i < projectusers.length; i++) {
+            if (projectusers[i].email == req.params.userid) {
+                projectusers.splice(i, 1);
+                break;
+            }
+        }
+        await item.save();
+    }
+
+    res.sendStatus(200);
+};
+
+
+
+exports.updateProjectUser = async (req, res, next) => {
+    if (await checkHubAuthorized(req.session.user.email,req.session.hub._id.toString(),1)) {
+
+        var item = await Projects.findOne({ "_id": req.params.projectid });
+        let projectusers = item.users;
+
+        for (let i = 0; i < projectusers.length; i++) {
+            if (projectusers[i].email == req.params.userid) {
+                let role = 2;
+                if (req.params.role == "Editor")
+                {
+                    role = 1;
+                }
+                projectusers[i].role = role;
+                break;
+            }
+        }
+        await item.save();
     }
 
     res.sendStatus(200);

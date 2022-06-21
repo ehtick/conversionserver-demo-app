@@ -137,6 +137,14 @@ class AdminProject {
     }
 
 
+    
+    async _deleteUserFromProject(event) {
+        let id = event.currentTarget.id.split("-")[1];
+        let email = this._projectusertable.getRow(id).getCell("email").getValue();
+        await fetch(serveraddress + '/api/deleteProjectUser/' + this.editProject.id + "/" + email, { method: 'PUT' });        
+        this.refreshProjectTable();
+    }
+
     addUserToProject()
     {
         let prop = {id:this._projectusertable.getData().length,email:"", role:"Viewer", edit:true};
@@ -144,6 +152,18 @@ class AdminProject {
         this._projectusertable.addData([prop], false);
         this._projectusertable.redraw();
     }
+
+    _discardEdit(event) {
+        let id = event.currentTarget.id.split("-")[1];
+        this._projectusertable.getRow(id).getCell("edit").setValue(false);
+        this.refreshProjectTable();
+    }
+
+    _enableEdit(event) {
+        let id = event.currentTarget.id.split("-")[1];
+        this._projectusertable.getRow(id).getCell("edit").setValue(true);
+    }
+
 
     async handleEditProjectDialog() {
 
@@ -227,7 +247,7 @@ class AdminProject {
         $("#epc_accept-" + cell.getData().id).on("click", function (event) { _this._acceptEdit(event); });
         $("#epc_edit-" + cell.getData().id).on("click", function (event) { _this._enableEdit(event); });
          $("#epc_cancel-" + cell.getData().id).on("click", function (event) { _this._discardEdit(event); });
-         $("#epc_delete-" + cell.getData().id).on("click", function (event) { _this._deleteUserFromHub(event); });
+         $("#epc_delete-" + cell.getData().id).on("click", function (event) { _this._deleteUserFromProject(event); });
         // this._updateCellStyle(cell.getData().id);        
     }
 

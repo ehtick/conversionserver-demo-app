@@ -25,6 +25,8 @@ router.put('/project/:projectid', loginController.putProject);
 router.get('/projects', loginController.getProjects);
 router.get('/projectusers/:projectid', loginController.getProjectUsers);
 router.put('/addProjectUser/:projectid/:userid/:role', loginController.addProjectUser);
+router.put('/deleteProjectUser/:projectid/:userid', loginController.deleteProjectUser);
+router.put('/updateProjectUser/:projectid/:userid/:role', loginController.updateProjectUser);
 
 router.put('/hub/:hubid', loginController.putHub);
 router.get('/hubs', loginController.getHubs);
