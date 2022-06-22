@@ -13,3 +13,5 @@ router.get('/checklogin', loginController.checkLogin);
 router.get('/configuration', loginController.configuration);
 router.post('/webhook', apiController.processWebhook);
 
+router.get('/streamingSession', apiController.getStreamingSession);
+

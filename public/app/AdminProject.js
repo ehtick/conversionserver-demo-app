@@ -26,13 +26,6 @@ class AdminProject {
     }
 
 
-    handleRenameProjectDialog() {
-        this.currentProject = $("#projectselect").val();
-        let myModal = new bootstrap.Modal(document.getElementById('renameprojectModal'));
-        myModal.toggle();
-    }
-
-
     async renameProject() {
         var res = await fetch(serveraddress + '/api/renameproject/' + this.currentProject + "/" +  $("#renamedProjectName").val(), { method: 'PUT' });
         this.handleProjectSelection();

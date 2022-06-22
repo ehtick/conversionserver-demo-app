@@ -4,6 +4,7 @@
     "conversionServiceURI": "http://localhost:3001",
     "useCSAPI": false,
     "useDirectFetch": false,
+    "useStreaming": true,
     "demoMode": "off",
     "assignDemoHub":true
   }

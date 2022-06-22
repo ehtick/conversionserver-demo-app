@@ -39,3 +39,5 @@ router.put('/newhub/:hubname', loginController.putNewHub);
 router.put('/acceptHub/:hubid/:userid', loginController.acceptHub);
 
 router.get('/users', loginController.getUsers);
+
+router.put('/enableStreamAccess/:itemid', apiController.enableStreamAccess);

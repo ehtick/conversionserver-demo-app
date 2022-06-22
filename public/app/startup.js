@@ -15,11 +15,6 @@ function msready() {
 
     hwv.view.setAmbientOcclusionEnabled(true);
 
-    myAdmin = new Admin();
-    myAdmin.setUpdateUICallback(mainUI.updateMenu);
-
-    myAdmin.checkLogin();
-  
 
     $(window).resize(function () {
       resizeCanvas();
@@ -30,44 +25,87 @@ function msready() {
   }, 10);
 }
 
-function setupApp() {
+async function setupApp() {
+
+  myAdmin = new Admin();
+  await myAdmin.checkLogin();
+
+  mainUI = new MainUI();
+  mainUI.registerSideBars("sidebar_models", 450);
+
+  myAdmin.setUpdateUICallback(mainUI.updateMenu);
+
+
+  let viewer;
+  if (!myAdmin.useStreaming) {
+    viewer = await Sample.createViewer();
+  }
+  else {
+
+    let res = await fetch(serveraddress + '/api/streamingSession');
+    var data = await res.json();
+
+    viewer = new Communicator.WebViewer({
+      containerId: "content",
+      endpointUri: 'ws://localhost:80?token=' + data.sessionid,
+      model: "_empty",
+      rendererType: "csr"
+    });
+  }
+
+  hwv = viewer;
+  var screenConfiguration =
+    md.mobile() !== null
+      ? Communicator.ScreenConfiguration.Mobile
+      : Sample.screenConfiguration;
+  var uiConfig = {
+    containerId: "viewerContainer",
+    screenConfiguration: screenConfiguration,
+    showModelBrowser: true,
+    showToolbar: true,
+  };
+
+  ui = new Communicator.Ui.Desktop.DesktopUi(hwv, uiConfig);
+
 
   hwv.setCallbacks({
     modelStructureReady: msready,
   });
 
+  hwv.start();
+
   var viewermenu = [
     {
       name: 'Login',
       fun: async function () {
-          myAdmin.handleLogin();
+        myAdmin.handleLogin();
       }
     },
     {
       name: 'Switch Hub',
       fun: async function () {
-          myAdmin.adminHub.handleHubSwitch();
+        myAdmin.adminHub.handleHubSwitch();
       }
-    },    
+    },
     {
       name: 'Switch Project',
       fun: async function () {
-          myAdmin.adminProject.handleProjectSwitch();
+        myAdmin.adminProject.handleProjectSwitch();
       }
-    },    
+    },
     {
       name: 'Logout',
       fun: async function () {
-          myAdmin.handleLogout();
+        myAdmin.handleLogout();
       }
     },
     {
       name: 'Register',
       fun: async function () {
-          myAdmin.handleRegistration();
+        myAdmin.handleRegistration();
       }
     }
-  
+
   ];
 
   $('#viewermenu1button').contextMenu("menu", viewermenu, {
@@ -76,21 +114,18 @@ function setupApp() {
     horAdjust: -35
   });
 
-  mainUI = new MainUI();
-  mainUI.registerSideBars("sidebar_models",450);
 
 }
 
-function resizeCanvas()
-{
- 
-    let offset = $("#content").offset();
-    let width = $(window).width() - offset.left;
-    let height = $(window).height() - offset.top;
-    $("#content").css("width", width + "px");
-    $("#content").css("height", (height) + "px");
-    hwv.resizeCanvas();
-    $("#toolBar").css("left", (width/2-250) + "px");
-    $("#toolBar").css("top", (height-50) +  "px");
-   
+function resizeCanvas() {
+
+  let offset = $("#content").offset();
+  let width = $(window).width() - offset.left;
+  let height = $(window).height() - offset.top;
+  $("#content").css("width", width + "px");
+  $("#content").css("height", (height) + "px");
+  hwv.resizeCanvas();
+  $("#toolBar").css("left", (width / 2 - 250) + "px");
+  $("#toolBar").css("top", (height - 50) + "px");
+
 }

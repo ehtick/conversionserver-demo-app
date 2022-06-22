@@ -84,33 +84,8 @@
     var ui = null;
     var md = new MobileDetect(window.navigator.userAgent);
 
-    window.onload = function () {
-      Sample.createViewer().then(
-        function (viewer) {
-          hwv = viewer;
-
-          var screenConfiguration =
-            md.mobile() !== null
-              ? Communicator.ScreenConfiguration.Mobile
-              : Sample.screenConfiguration;
-          var uiConfig = {
-            containerId: "viewerContainer",
-            screenConfiguration: screenConfiguration,
-            showModelBrowser: true,
-            showToolbar: true,
-          };
-
-          ui = new Communicator.Ui.Desktop.DesktopUi(hwv, uiConfig);
-          setupApp();
-          hwv.start();       
-        },
-        function (errorReason) {
-          var errorDialog = new Communicator.Ui.UiDialog("content");
-          errorDialog.setTitle("Viewer Error");
-          errorDialog.setText(errorReason);
-          errorDialog.show();
-        }
-      );
+    window.onload = async function () {
+      setupApp();           
     };
   </script>
 </head>
@@ -209,7 +184,6 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel">Edit Project</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div class="mb-3">
@@ -223,8 +197,8 @@
       </div>
       <br>
       <div class="modal-footer">
-        
-        <button type="button" id="" class="btn btn-primary"
+        "
+        <button type="button" id="" class="btn btn-primary" onclick=  "myAdmin.adminProject.handleProjectSelection();"
           data-bs-dismiss="modal">Dismiss</button>
       </div>
     </div>
@@ -286,7 +260,6 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">Edit Hub</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <div class="mb-3">
@@ -301,7 +274,7 @@
           <br>
           <div class="modal-footer">
             
-            <button type="button" id="" class="btn btn-primary"
+            <button type="button" id="" class="btn btn-primary" onclick=  "myAdmin.adminHub.handleHubSelection();"
               data-bs-dismiss="modal">Dismiss</button>
           </div>
         </div>
@@ -330,30 +303,6 @@
     </div>
   </div>
   
-  
-
-
-
-<div class="modal fade" id="renameprojectModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Rename Project</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="mb-3">
-          <label for="renameProjectName" class="form-label">New Name</label>
-          <input type="text" class="form-control" id="renamedProjectName">
-        </div>
-       </div>
-      <br>
-      <div class="modal-footer">
-        <button type="button" onclick="myAdmin.adminProject.renameProject();" class="btn btn-primary" data-bs-dismiss="modal">Rename</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 
   <button class = "bcfbutton" id="viewermenu1button" style="right:5px; position:absolute;z-index:10000000;"><i style="pointer-events:none" class='bx bx-menu'></i></button>

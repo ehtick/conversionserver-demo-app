@@ -6,6 +6,7 @@ class Admin {
         this.currentHub = null;
         this.demoMode = "off";
         this.useDirectFetch = false;
+        this.useStreaming = true;
     
         this._updateUICallback = null;
      
@@ -30,13 +31,14 @@ class Admin {
     {
         var res = await fetch(serveraddress + '/api/configuration');
         var data = await res.json();
-        this.useDirectFetch = data.useDirectFetch;      
+        this.useDirectFetch = data.useDirectFetch;     
+        this.useStreaming = data.useStreaming; 
         this.demoMode = data.demoMode;                 
     }
 
     async checkLogin()
     {
-        this.getConfiguration();
+        await this.getConfiguration();
         var res = await fetch(serveraddress + '/api/checklogin');
         var data = await res.json();
         if (data.succeeded)

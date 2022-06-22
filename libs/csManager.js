@@ -8,7 +8,7 @@ const fetch = require('node-fetch');
 
 let conversionServiceURI = "";
 let _updatedTime = new Date();
-
+var streamingSessionId = null;
 
 exports.init = (uri) =>
 {
@@ -175,6 +175,21 @@ exports.updateConversionStatus =  async (storageId, files) => {
         }
     }
     _checkPendingConversions();
+};
+
+
+exports.getStreamingSession =  async () => {
+    let res = await fetch(conversionServiceURI + '/api/streamingSession');
+    let data = await res.json();
+    streamingSessionId = data.sessionid;
+    return data;
+};
+
+
+
+exports.enableStreamAccess =  async (itemid, project) => {
+    let item = await CsFiles.findOne({ "_id": itemid, project:project});
+    await fetch(conversionServiceURI + '/api/enableStreamAccess/' + streamingSessionId + "/" + item.storageID,{ method: 'put'});
 };
 
 var ONE_HOUR = 60 * 60 * 1000;

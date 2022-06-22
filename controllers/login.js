@@ -68,7 +68,7 @@ exports.postLogin = async(req, res, next) => {
 
 exports.configuration = async(req, res, next) => {    
     console.log("configuration");    
-    res.json({useDirectFetch : config.get('app.useDirectFetch'),demoMode: config.get('app.demoMode')});    
+    res.json({useDirectFetch : config.get('app.useDirectFetch'),useStreaming : config.get('app.useStreaming'),demoMode: config.get('app.demoMode')});    
 };
 
 

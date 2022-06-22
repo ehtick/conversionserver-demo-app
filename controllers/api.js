@@ -69,3 +69,16 @@ exports.generateSTEP = async (req, res, next) => {
     csmanager.generateSTEP(req.params.itemid,req.session.project);
     res.sendStatus(200);
 };
+
+
+exports.getStreamingSession = async (req, res, next) => {
+    let s = await csmanager.getStreamingSession();
+    res.json(s);
+};
+
+
+
+exports.enableStreamAccess = async (req, res, next) => {
+    let s = await csmanager.enableStreamAccess(req.params.itemid,req.session.project);
+    res.sendStatus(200);
+};
