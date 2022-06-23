@@ -73,12 +73,18 @@ exports.generateSTEP = async (req, res, next) => {
 
 exports.getStreamingSession = async (req, res, next) => {
     let s = await csmanager.getStreamingSession();
+    setTimeout(() => {
+    req.session.streamingSessionId = s.sessionid.slice();
+    req.session.save();
+    console.log(req.session.id.toString(), req.session.streamingSessionId);
+    }, 300);
     res.json(s);
 };
 
 
 
 exports.enableStreamAccess = async (req, res, next) => {
-    let s = await csmanager.enableStreamAccess(req.params.itemid,req.session.project);
+    let s = await csmanager.enableStreamAccess(req.params.itemid,req.session.project, req.session.streamingSessionId);
+    console.log("Access:" + req.session.id.toString() + " "  + req.session.streamingSessionId);
     res.sendStatus(200);
 };

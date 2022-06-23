@@ -25,17 +25,10 @@ function msready() {
   }, 10);
 }
 
-async function setupApp() {
 
-  myAdmin = new Admin();
-  await myAdmin.checkLogin();
-
-  mainUI = new MainUI();
-  mainUI.registerSideBars("sidebar_models", 450);
-
-  myAdmin.setUpdateUICallback(mainUI.updateMenu);
-
-
+async function initializeViewer()
+{
+  
   let viewer;
   if (!myAdmin.useStreaming) {
     viewer = await Sample.createViewer();
@@ -73,7 +66,23 @@ async function setupApp() {
   });
 
   hwv.start();
+}
 
+async function setupApp() {
+
+  mainUI = new MainUI();
+  mainUI.registerSideBars("sidebar_models", 450);
+
+
+  myAdmin = new Admin();
+  myAdmin.setUpdateUICallback(mainUI.updateMenu);
+  await myAdmin.checkLogin();
+
+  
+  if (myAdmin.currentUser)
+  {
+    initializeViewer();
+  }
   var viewermenu = [
     {
       name: 'Login',

@@ -92,7 +92,6 @@ exports.checkLogin = async (req, res, next) => {
     }
 
     if (req.session && req.session.user) {
-        console.log(req.session.project);
         let projectid = null;
         let hubinfo = null;
 

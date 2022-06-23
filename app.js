@@ -86,8 +86,8 @@ mongoose
 
     app.use(session({
       secret: "mysecret",
-      resave: true,
-      saveUninitialized: false,
+      resave: false,
+      saveUninitialized: true,
       store: store
     }));
 

@@ -159,6 +159,7 @@ class Admin {
                     $(".loggedinuser").empty();
                     $(".loggedinuser").append(response.user.email);
                     _this.adminHub.handleHubSelection();
+                    initializeViewer();
                     _this._updateUI();
                 }
 
