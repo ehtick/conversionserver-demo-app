@@ -9,6 +9,51 @@ class MainUI {
 
     }
 
+
+    setupMenu() {
+
+        var viewermenu = [
+            {
+                name: 'Login',
+                fun: async function () {
+                    myAdmin.handleLogin();
+                }
+            },
+            {
+                name: 'Switch Hub',
+                fun: async function () {
+                    myAdmin.adminHub.handleHubSwitch();
+                }
+            },
+            {
+                name: 'Switch Project',
+                fun: async function () {
+                    myAdmin.adminProject.handleProjectSwitch();
+                }
+            },
+            {
+                name: 'Logout',
+                fun: async function () {
+                    myAdmin.handleLogout();
+                }
+            },
+            {
+                name: 'Register',
+                fun: async function () {
+                    myAdmin.handleRegistration();
+                }
+            }
+
+        ];
+
+        $('#viewermenu1button').contextMenu("menu", viewermenu, {
+            'displayAround': 'trigger',
+            verAdjust: 45,
+            horAdjust: -35
+        });
+
+    }
+
     registerSideBars(div, width, callback) {
         this.sideBars[div] = { width: width, expanded: false, callback: callback };
     }

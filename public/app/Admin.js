@@ -9,6 +9,7 @@ class Admin {
         this.useStreaming = true;
     
         this._updateUICallback = null;
+        this._loggedInCallback = null;
      
         this.adminHub = new AdminHub();
         this.adminProject = new AdminProject();
@@ -20,6 +21,12 @@ class Admin {
     {
         this._updateUICallback = updateuicallback;
     }
+
+    setLoggedInCallback(loggedincallback)
+    {
+        this._loggedInCallback = loggedincallback;
+    }
+
 
     _updateUI() {
         if (this._updateUICallback) {
@@ -44,6 +51,10 @@ class Admin {
         if (data.succeeded)
         {
             this.currentUser = data.user;
+            if (this.currentUser)
+            {
+                this._loggedInCallback();
+            }
   
             $(".loggedinuser").html(data.user.email);
 
@@ -159,7 +170,7 @@ class Admin {
                     $(".loggedinuser").empty();
                     $(".loggedinuser").append(response.user.email);
                     _this.adminHub.handleHubSelection();
-                    initializeViewer();
+                    _this._loggedInCallback();
                     _this._updateUI();
                 }
 

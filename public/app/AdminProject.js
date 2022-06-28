@@ -4,12 +4,12 @@ class AdminProject {
    
         this._userhash = [];
         this._projectusertable = null;
-        this._newProjectCallback = null;
+        this._loadProjectCallback = null;
     }
 
-    setNewProjectCallback(newprojectcallback)
+    setLoadProjectCallback(loadprojectcallback)
     {
-        this._newProjectCallback = newprojectcallback;
+        this._loadProjectCallback = loadprojectcallback;
     }
 
     async handleProjectSwitch()

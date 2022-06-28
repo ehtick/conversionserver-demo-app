@@ -1,6 +1,24 @@
 const serveraddress = "http://" + window.location.host;
 var myAdmin;
 
+
+async function setupApp() {
+
+  mainUI = new MainUI();
+  mainUI.setupMenu();
+  mainUI.registerSideBars("sidebar_models", 450);
+
+
+
+  myAdmin = new Admin();
+  myAdmin.setUpdateUICallback(mainUI.updateMenu);
+  myAdmin.setLoggedInCallback(initializeViewer);
+  await myAdmin.checkLogin();
+
+}
+
+
+
 function msready() {
 
   // $("#content").css("top", "0px");
@@ -42,7 +60,7 @@ async function initializeViewer()
       containerId: "content",
       endpointUri: 'ws://localhost:80?token=' + data.sessionid,
       model: "_empty",
-      rendererType: "csr"
+      rendererType:  Communicator.RendererType.Server
     });
   }
 
@@ -68,63 +86,6 @@ async function initializeViewer()
   hwv.start();
 }
 
-async function setupApp() {
-
-  mainUI = new MainUI();
-  mainUI.registerSideBars("sidebar_models", 450);
-
-
-  myAdmin = new Admin();
-  myAdmin.setUpdateUICallback(mainUI.updateMenu);
-  await myAdmin.checkLogin();
-
-  
-  if (myAdmin.currentUser)
-  {
-    initializeViewer();
-  }
-  var viewermenu = [
-    {
-      name: 'Login',
-      fun: async function () {
-        myAdmin.handleLogin();
-      }
-    },
-    {
-      name: 'Switch Hub',
-      fun: async function () {
-        myAdmin.adminHub.handleHubSwitch();
-      }
-    },
-    {
-      name: 'Switch Project',
-      fun: async function () {
-        myAdmin.adminProject.handleProjectSwitch();
-      }
-    },
-    {
-      name: 'Logout',
-      fun: async function () {
-        myAdmin.handleLogout();
-      }
-    },
-    {
-      name: 'Register',
-      fun: async function () {
-        myAdmin.handleRegistration();
-      }
-    }
-
-  ];
-
-  $('#viewermenu1button').contextMenu("menu", viewermenu, {
-    'displayAround': 'trigger',
-    verAdjust: 45,
-    horAdjust: -35
-  });
-
-
-}
 
 function resizeCanvas() {
 
