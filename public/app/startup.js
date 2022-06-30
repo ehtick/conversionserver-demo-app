@@ -13,10 +13,19 @@ async function setupApp() {
   myAdmin = new Admin();
   myAdmin.setUpdateUICallback(mainUI.updateMenu);
   myAdmin.setLoggedInCallback(initializeViewer);
+  myAdmin.adminProject.setLoadProjectCallback(loadProjectCallback);
+
   await myAdmin.checkLogin();
 
 }
 
+
+
+function loadProjectCallback()
+{
+  CsManagerClient.msready();
+  
+}
 
 
 function msready() {

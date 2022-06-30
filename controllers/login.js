@@ -167,11 +167,14 @@ exports.putDeleteProject = async(req, res, next) => {
     res.sendStatus(200);   
 };
 
-exports.putRenameProject = async(req, res, next) => {    
+exports.putRenameProject = async (req, res, next) => {
 
-    let item = await Projects.findOne({ "_id": req.params.projectid });
-    item.name = req.params.newname;
-    item.save();
+    if (await checkHubAuthorized(req.session.user.email, req.session.hub._id.toString(), 1)) {
+
+        let item = await Projects.findOne({ "_id": req.params.projectid });
+        item.name = req.params.newname;
+        item.save();
+    }
     res.sendStatus(200);
 
 };
@@ -417,6 +420,20 @@ exports.addHubUser = async (req, res, next) => {
 
     res.sendStatus(200);
 };
+
+
+
+exports.putRenameHub = async (req, res, next) => {
+    if (await checkHubAuthorized(req.session.user.email, req.params.hubid, 1)) {
+        let item = await Hubs.findOne({ "_id": req.params.hubid });
+        item.name = req.params.newname;
+        item.save();
+    }
+    res.sendStatus(200);
+
+};
+
+
 
 
 exports.deleteHubUser = async (req, res, next) => {

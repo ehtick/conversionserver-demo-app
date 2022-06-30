@@ -27,8 +27,7 @@ class AdminProject {
 
 
     async renameProject() {
-        var res = await fetch(serveraddress + '/api/renameproject/' + this.currentProject + "/" +  $("#renamedProjectName").val(), { method: 'PUT' });
-        this.handleProjectSelection();
+        var res = await fetch(serveraddress + '/api/renameProject/' + this.editProject.id + "/" +  $("#editProjectName").val(), { method: 'PUT' });
     }
 
     async newProject() {
@@ -57,8 +56,7 @@ class AdminProject {
         myAdmin.currentProject = data.projectname;              
         myAdmin._updateUI();
         $(".modal-backdrop").remove();
-        CsManagerClient.msready();
-
+        this._loadProjectCallback();
     }
 
     async loadProjectFromDialog() {

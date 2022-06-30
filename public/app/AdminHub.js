@@ -36,6 +36,11 @@ class AdminHub {
     }
 
     
+    async renameHub() {
+        var res = await fetch(serveraddress + '/api/renameHub/' + this.editHub.id + "/" +  $("#editHubName").val(), { method: 'PUT' });
+    }
+
+    
     handleNewHubDialog() {
         let myModal = new bootstrap.Modal(document.getElementById('newhubModal'));
         myModal.toggle();
