@@ -51,7 +51,7 @@ class Admin {
         if (data.succeeded)
         {
             this.currentUser = data.user;
-            if (this.currentUser)
+            if (this.currentUser && this._loggedInCallback)
             {
                 this._loggedInCallback();
             }
@@ -169,9 +169,13 @@ class Admin {
                     _this.currentUser = response.user;
                     $(".loggedinuser").empty();
                     $(".loggedinuser").append(response.user.email);
-                    _this.adminHub.handleHubSelection();
-                    _this._loggedInCallback();
+                    _this.adminHub.handleHubSelection();                   
                     _this._updateUI();
+                    if (_this.currentUser && _this._loggedInCallback)
+                    {
+                        _this._loggedInCallback();
+                    }
+        
                 }
 
 

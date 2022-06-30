@@ -56,7 +56,9 @@ class AdminProject {
         myAdmin.currentProject = data.projectname;              
         myAdmin._updateUI();
         $(".modal-backdrop").remove();
-        this._loadProjectCallback();
+        if (this._loadProjectCallback) {
+            this._loadProjectCallback();
+        }
     }
 
     async loadProjectFromDialog() {
