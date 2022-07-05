@@ -4,6 +4,21 @@ var myAdmin;
 
 async function setupApp() {
 
+  $.notify.addStyle('notifyerror', {
+    html: "<div><span data-notify-text/></div>",
+    classes: {
+      base: {
+        "white-space": "nowrap",
+        "background-color": "white",
+        'color': 'black',
+        'box-shadow': "rgba(0, 0, 0, 0.35) 0px 5px 15px",
+        'border-radius': "25px",
+        'opacity': "0.75",
+        'padding': "15px"
+      }
+    }
+  });
+
   mainUI = new MainUI();
   mainUI.setupMenu();
   mainUI.registerSideBars("sidebar_models", 450);
@@ -20,11 +35,9 @@ async function setupApp() {
 
 
 
-function loadProjectCallback()
-{
+function loadProjectCallback() {
   initializeViewer();
   CsManagerClient.msready();
-  
 }
 
 

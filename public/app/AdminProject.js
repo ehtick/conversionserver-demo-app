@@ -27,7 +27,7 @@ class AdminProject {
 
 
     async renameProject() {
-        var res = await fetch(serveraddress + '/api/renameProject/' + this.editProject.id + "/" +  $("#editProjectName").val(), { method: 'PUT' });
+        var res = await fetch(serveraddress + '/api/renameproject/' + this.editProject.id + "/" +  $("#editProjectName").val(), { method: 'PUT' });
     }
 
     async newProject() {

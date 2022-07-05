@@ -20,7 +20,7 @@ router.put('/deleteModel/:itemid', apiController.deleteModel);
 
 router.put('/newproject/:projectname', loginController.putNewProject);
 router.put('/deleteproject/:projectid', loginController.putDeleteProject);
-router.put('/renameProject/:projectid/:newname', loginController.putRenameProject);
+router.put('/renameproject/:projectid/:newname', loginController.putRenameProject);
 router.put('/project/:projectid', loginController.putProject);
 router.get('/projects', loginController.getProjects);
 router.get('/projectusers/:projectid', loginController.getProjectUsers);

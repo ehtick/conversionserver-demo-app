@@ -9,7 +9,47 @@ const config = require('config');
 
 //var nodemailer = require('nodemailer');
 
+
+const fs = require('fs');
+
+
+async function copyStarterProject(user,hub)
+{
+    let newproject = null;
+    let project = await Projects.findOne({ "_id": config.get('app.demoProject') });
+    if (project) {
+        newproject = new Projects({
+            name: project.name,
+            users:[],
+            hub:hub
+        });
+
+        await newproject.save();
+        await addOneProjectUser(newproject.id,user.email,0);
+      
+        let files = await CsFiles.find({ "project": project });
+        for (let i = 0; i < files.length; i++) {
+            let newfile = new CsFiles({
+                project: newproject,
+                name: files[i].name,
+                converted: true,
+                storageid: files[i].storageid,
+                filesize: files[i].filesize,
+                hasStep: files[i].hasStep,
+                uploaded: files[i].uploaded,              
+            });
+            await newfile.save();            
+        }
+
+    }
+    return newproject;
+}
+
 exports.postRegister = async(req, res, next) => {
+    if (config.get('app.demoMode')) {
+        res.json({ERROR:"Demo mode. Can't register users."});
+        return;
+    }
     console.log("Registration");
 
     let item = await Users.findOne({ "email":  req.body.email });
@@ -23,33 +63,34 @@ exports.postRegister = async(req, res, next) => {
 
         req.session.user = user;
 
-        if (config.get('app.assignDemoHub') == true)
+        if (config.get('app.assignDemoHub') == true && config.get('app.demoProject') != "")
         {
-            let hub = await Hubs.findOne({ "name": "Demo Hub" });
-            if (hub) {
-                await addOneHubUser(hub.id,user.email,2, true);
-                let project = await Projects.findOne({ "name": "Demo Project" });
-                if (project) {
-                    await addOneProjectUser(project.id,user.email,2);
-                }
-
-            }
+            let hub = new Hubs({ "name": "Demo Hub", users:[]});
+            await hub.save();
+            await addOneHubUser(hub.id,user.email,0, true);
+            let project = await copyStarterProject(user,hub);
+            await addOneProjectUser(project.id,user.email,0);
+            
         }
-        res.json({succeeded:true, user:req.session.user.email});
+        res.json({user:req.session.user.email});
     }
     else 
-        res.json({succeeded:false});
+        res.json({ERROR:"User already exists"});
 };
 
 
 
 exports.postLogin = async(req, res, next) => {    
     console.log("login");
+    if (config.get('app.demoMode')) {
+        res.json({ERROR:"Demo mode. No manual login allowed."});
+        return;
+    }
 
     let item = await Users.findOne({ "email":  req.body.email });
     if (!item) 
     {        
-        res.json({succeeded:false});
+        res.json({ERROR:"User not found"});
     }
     else 
     {
@@ -61,7 +102,7 @@ exports.postLogin = async(req, res, next) => {
             res.json({succeeded:true, user:{email:req.session.user.email}});
         }
         else
-            res.json({succeeded:false});
+            res.json({ERROR:"Wrong password"});
     }
 };
 
@@ -75,7 +116,8 @@ exports.configuration = async(req, res, next) => {
 
 exports.checkLogin = async (req, res, next) => {
     console.log("check login");
-    if (config.get('app.demoMode') == "login" && req.session.user == undefined) {
+    if (config.get('app.demoMode')) {
+        req.session.user = null;
         let item = await Users.findOne({ "email": "demouser@techsoft3d.com" });
         if (item) {
             let hub = await Hubs.findOne({ "name": "Demo Hub", "users.email": item.email });
@@ -127,6 +169,7 @@ exports.putLogout = async (req, res, next) => {
 };
 
 exports.putNewProject = async (req, res, next) => {
+    
     if (await checkHubAuthorized(req.session.user.email, req.session.hub._id.toString(), 1)) {
 
         console.log("new project");
@@ -142,7 +185,7 @@ exports.putNewProject = async (req, res, next) => {
     }
     else
     {
-        res.sendStatus(200);       
+        res.json({ ERROR: "Not authorized." });
     }
 };
 
@@ -162,9 +205,14 @@ async function deleteOneProject(projectid, req) {
 
 exports.putDeleteProject = async(req, res, next) => {    
 
-    await deleteOneProject(req.params.projectid, req);
-
-    res.sendStatus(200);   
+    if (await checkHubAuthorized(req.session.user.email, req.session.hub._id.toString(), 1)) {
+        await deleteOneProject(req.params.projectid, req);
+        res.sendStatus(200);   
+    }
+    else
+    {
+        res.json({ ERROR: "Not authorized." });
+    }
 };
 
 exports.putRenameProject = async (req, res, next) => {
@@ -174,8 +222,12 @@ exports.putRenameProject = async (req, res, next) => {
         let item = await Projects.findOne({ "_id": req.params.projectid });
         item.name = req.params.newname;
         item.save();
+        res.sendStatus(200);
     }
-    res.sendStatus(200);
+    else
+    {
+        res.json({ ERROR: "Not authorized." });
+    }
 
 };
 
@@ -318,9 +370,13 @@ exports.addProjectUser = async (req, res, next) => {
         }
 
         await addOneProjectUser(req.params.projectid, req.params.userid, role);
+        res.sendStatus(200);
+    }
+    else
+    {
+        res.json({ ERROR: "Not authorized." });
     }
 
-    res.sendStatus(200);
 };
 
 
@@ -339,9 +395,12 @@ async function deleteOneProjectUser(projectid, email) {
 exports.deleteProjectUser = async (req, res, next) => {
     if (await checkHubAuthorized(req.session.user.email,req.session.hub._id.toString(),1)) {
         await deleteOneProjectUser(req.params.projectid, req.params.userid);     
+        res.sendStatus(200);
     }
-
-    res.sendStatus(200);
+    else
+    {
+        res.json({ ERROR: "Not authorized." });
+    }
 };
 
 
@@ -364,9 +423,12 @@ exports.updateProjectUser = async (req, res, next) => {
             }
         }
         await item.save();
+        res.sendStatus(200);
     }
-
-    res.sendStatus(200);
+    else
+    {
+        res.json({ ERROR: "Not authorized." });
+    }
 };
 
 
@@ -416,9 +478,12 @@ exports.addHubUser = async (req, res, next) => {
         }
 
         await addOneHubUser(req.params.hubid, req.params.userid, role, false);
+        res.sendStatus(200);
     }
-
-    res.sendStatus(200);
+    else
+    {
+        res.json({ ERROR: "Not authorized." });
+    }
 };
 
 
@@ -428,8 +493,12 @@ exports.putRenameHub = async (req, res, next) => {
         let item = await Hubs.findOne({ "_id": req.params.hubid });
         item.name = req.params.newname;
         item.save();
+        res.sendStatus(200);
     }
-    res.sendStatus(200);
+    else
+    {
+        res.json({ ERROR: "Not authorized." });
+    }
 
 };
 
@@ -456,9 +525,12 @@ exports.deleteHubUser = async (req, res, next) => {
             }
         }
         await item.save();
+        res.sendStatus(200);
     }
-
-    res.sendStatus(200);
+    else
+    {
+        res.json({ ERROR: "Not authorized." });
+    }
 };
 
 
@@ -480,13 +552,21 @@ exports.updateHubUser = async (req, res, next) => {
             }
         }
         await item.save();
+        res.sendStatus(200);
     }
-
-    res.sendStatus(200);
+    else
+    {
+        res.json({ ERROR: "Not authorized." });
+    }
 };
 
 
 async function checkHubAuthorized(email,hubid, role) {
+
+    if (config.get('app.demoMode')) {     
+        return false;
+    }
+
     let hub = await Hubs.findOne({ "_id": hubid, "users": { $elemMatch: { "email": email, "role": { $lte: role } } } });
 
     if (hub) {
@@ -499,8 +579,11 @@ async function checkHubAuthorized(email,hubid, role) {
 
 
 exports.putDeleteHub = async (req, res, next) => {
+    if (config.get('app.demoMode')) {
+        res.json({ERROR:"Not authorized."});
+        return;
+    }
     let hub = await Hubs.findOne({ "_id": req.params.hubid, "users": { $elemMatch: { "email": req.session.user.email, "role": { $lt: 1 } } } });
-
     if (hub) {
 
         let projects = await Projects.find({"hub": req.params.hubid });
@@ -534,6 +617,10 @@ exports.acceptHub = async (req, res, next) => {
 
 
 exports.putNewHub = async(req, res, next) => {    
+    if (config.get('app.demoMode')) {
+        res.json({ERROR:"Not authorized."});
+        return;
+    }
     console.log("new hub");
     const hub = new Hubs({
         name: req.params.hubname,
@@ -547,7 +634,10 @@ exports.putNewHub = async(req, res, next) => {
 
 
 exports.putHub = async(req, res, next) => {    
-
+    if (config.get('app.demoMode')) {
+        res.json({ERROR:"Not authorized."});
+        return;
+    }
     if (req.params.hubid != "none") {
         var item = await Hubs.findOne({ "_id": req.params.hubid });
         req.session.hub = item;

@@ -69,8 +69,9 @@ mongoose
       }
     });
 
-
-    app.use(multer({ storage: fileStorage }).single('file'));
+    if (!config.get('app.demoMode')) {
+      app.use(multer({ storage: fileStorage }).single('file'));
+    }
 
     app.use(express.static(path.join(__dirname, 'public')));
 

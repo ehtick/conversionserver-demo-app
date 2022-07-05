@@ -8,7 +8,11 @@ else
     csmanager = require('../libs/csManager');
 
 exports.postUpload = async(req, res, next) => {
-    
+    if (config.get('app.demoMode')) {
+        res.json({ERROR:"Not authorized."});
+        return;
+    }
+
     let id = req.file.destination.split("/");
     let result = "";
     result = await csmanager.process(id[1], req.file.originalname,req.session.project,req.headers.startpath);
@@ -16,6 +20,12 @@ exports.postUpload = async(req, res, next) => {
 };
 
 exports.getUploadToken = async(req, res, next) => {    
+
+    if (config.get('app.demoMode')) {
+        res.json({ERROR:"Not authorized."});
+        return;
+    }
+
     let result = await csmanager.getUploadToken(req.params.name,req.params.size,req.session.project);
     res.json(result);
 };
@@ -55,6 +65,12 @@ exports.getModels = async (req, res, next) => {
 };
 
 exports.deleteModel = async (req, res, next) => {
+
+    if (config.get('app.demoMode')) {
+        res.json({ERROR:"Not authorized."});
+        return;
+    }
+
     csmanager.deleteModel(req.params.itemid,req.session.project);
     res.sendStatus(200);
 };
@@ -66,6 +82,12 @@ exports.processWebhook = async (req, res, next) => {
 
 
 exports.generateSTEP = async (req, res, next) => {
+    
+    if (config.get('app.demoMode')) {
+        res.json({ERROR:"Not authorized."});
+        return;
+    }
+
     csmanager.generateSTEP(req.params.itemid,req.session.project);
     res.sendStatus(200);
 };

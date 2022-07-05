@@ -4,7 +4,7 @@ class Admin {
         this.currentUser = null;
         this.currentProject = null;
         this.currentHub = null;
-        this.demoMode = "off";
+        this.demoMode = false;
         this.useDirectFetch = false;
         this.useStreaming = true;
     
@@ -116,10 +116,13 @@ class Admin {
             contentType: false,
             processData: false,
             success: function (response) {
-                if (!response.succeeded)
+                if (response.ERROR) {
+                    $.notify("Error: " + response.ERROR, { style:"notifyerror",autoHideDelay: 3000, position: "bottom center" });
                     myAdmin.handleRegistration();
-                else
+                }
+                else {
                     CsManagerClient.msready();
+                }
             },
         });
     }
@@ -159,9 +162,11 @@ class Admin {
             success: function (response) {
 
 
-                if (!response.succeeded) {
+                if (response.ERROR) {
 
                     myAdmin.handleLogin();
+                    $.notify("Error: " + response.ERROR, { style:"notifyerror",autoHideDelay: 3000, position: "bottom center" });
+
 
                 }
                 else {
@@ -169,13 +174,13 @@ class Admin {
                     _this.currentUser = response.user;
                     $(".loggedinuser").empty();
                     $(".loggedinuser").append(response.user.email);
-                    _this.adminHub.handleHubSelection();                   
+                    _this.adminHub.handleHubSelection();
                     _this._updateUI();
+
                     if (_this.currentUser && _this._loggedInCallback)
                     {
                         _this._loggedInCallback();
                     }
-        
                 }
 
 
