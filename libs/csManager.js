@@ -25,6 +25,7 @@ exports.process = async (tempid, filename, project,startpath) => {
         filesize: stats.size,
         uploaded: new Date(),
         hasSTEP: "false",
+        hasXML: "false",
         project:project
 
     });
@@ -67,6 +68,7 @@ exports.getUploadToken = async (name, size, project) => {
             filesize: size,
             uploaded: new Date(),
             hasSTEP: "false",
+            hasXML: "false",
             project: project
         });
         await item.save();
@@ -123,11 +125,29 @@ exports.generateSTEP = async (itemid, project, startpath) => {
 
 };
 
+
+exports.generateXML = async (itemid, project, startpath) => {
+    
+    let item = await CsFiles.findOne({ "_id": itemid, project:project});
+    if (!item.hasXML || item.hasXML == "false")
+    {
+        item.hasXML = "pending";
+        await item.save();
+        console.log("processing XML:" + item.name);
+        let api_arg  = {conversionCommandLine:["--output_xml_assemblytree","","--sc_export_attributes","1"] };            
+        res = await fetch(conversionServiceURI + '/api/reconvert/' + item.storageID, { method: 'put',headers: { 'CS-API-Arg': JSON.stringify(api_arg) } });
+         _updated();
+
+    }
+
+};
+
 exports.getModels = async (project) => {
     let models = await CsFiles.find({project:project});
     let res = [];
     for (let i = 0; i < models.length; i++) {
-        res.push({ name: models[i].name, id: models[i]._id.toString(), pending: !models[i].converted, category:models[i].category,uploaded:models[i].uploaded, filesize:models[i].filesize, hasStep:models[i].hasSTEP});
+        res.push({ name: models[i].name, id: models[i]._id.toString(), pending: !models[i].converted, category:models[i].category,uploaded:models[i].uploaded, filesize:models[i].filesize, hasStep:models[i].hasSTEP,
+            hasXML:models[i].hasXML});
     }
     return {"updated":_updatedTime.toString(), "modelarray":res};
 };
@@ -135,6 +155,12 @@ exports.getModels = async (project) => {
 exports.getSTEP = async (itemid,project) => {
     let item = await CsFiles.findOne({ "_id": itemid, project:project});
     let res = await fetch(conversionServiceURI + '/api/file/' + item.storageID + "/step");
+    return await res.arrayBuffer();
+};
+
+exports.getXML = async (itemid,project) => {
+    let item = await CsFiles.findOne({ "_id": itemid, project:project});
+    let res = await fetch(conversionServiceURI + '/api/file/' + item.storageID + "/xml");
     return await res.arrayBuffer();
 };
 
@@ -161,13 +187,19 @@ exports.getPNG = async (itemid, project) => {
 exports.updateConversionStatus =  async (storageId, files) => {
     let item = await CsFiles.findOne({ "storageID": storageId});
 
-    if (files && item.hasSTEP == "pending")
+    if (files && (item.hasSTEP == "pending" || item.hasXML == "pending"))
     {
         for (let i=0;i<files.length;i++)
         {
             if (files[i].indexOf(".step") !=-1)
             {
                 item.hasSTEP = "true";
+                await item.save();
+                _updated();
+            }
+            if (files[i].indexOf(".xml") !=-1)
+            {
+                item.hasXML = "true";
                 await item.save();
                 _updated();
             }

@@ -20,6 +20,11 @@ const csFilesSchema = new Schema({
     type: String,
     required: false
   },
+
+  hasXML: {
+    type: String,
+    required: false
+  },
   
   filesize: { 
     type:Number,

@@ -53,6 +53,11 @@ exports.getSTEP = async(req, res, next) => {
     res.send(Buffer.from(result));
 };
 
+exports.getXML = async(req, res, next) => {
+    let result = await csmanager.getXML(req.params.itemid,req.session.project);
+    res.send(Buffer.from(result));
+};
+
 
 exports.getPNG = async(req, res, next) => {
     let result = await csmanager.getPNG(req.params.itemid,req.session.project);
@@ -91,6 +96,19 @@ exports.generateSTEP = async (req, res, next) => {
     csmanager.generateSTEP(req.params.itemid,req.session.project);
     res.sendStatus(200);
 };
+
+exports.generateXML = async (req, res, next) => {
+    
+    if (config.get('app.demoMode')) {
+        res.json({ERROR:"Not authorized."});
+        return;
+    }
+
+    csmanager.generateXML(req.params.itemid,req.session.project);
+    res.sendStatus(200);
+};
+
+
 
 
 exports.getStreamingSession = async (req, res, next) => {

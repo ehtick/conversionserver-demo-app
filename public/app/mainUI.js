@@ -45,13 +45,20 @@ class MainUI {
             }
 
         ];
-
-        $('#viewermenu1button').contextMenu("menu", viewermenu, {
+        if (!myAdmin.demoMode)
+        {
+          $('#viewermenu1button').contextMenu("menu", viewermenu, {
             'displayAround': 'trigger',
             verAdjust: 45,
             horAdjust: -35
-        });
-
+          });
+        }
+        else
+        {
+          $('#viewermenu1button').css("display", "none");
+          $('.fileUploadButton').css("display", "none");
+        }
+       
     }
 
     registerSideBars(div, width, callback) {

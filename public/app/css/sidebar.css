@@ -534,6 +534,13 @@ font-size:25px;
   
 }
 
+
+.fileUploadButton {
+  left: 0px;
+  
+}
+
+
 .edithubbuttons2:hover {
   background:grey;
 }

@@ -132,6 +132,7 @@ class CsManagerClient {
                 }
                 this._modelHash[data[i].id].image = part;
                 this._modelHash[data[i].id].hasStep  = data[i].hasStep;
+                this._modelHash[data[i].id].hasXML  = data[i].hasXML;
             }
         }
         this._drawModelList("sidebar_modellist");
@@ -145,7 +146,7 @@ class CsManagerClient {
 
         var html = "";
         $("#" + targetdiv).empty();
-        html += '<button onclick=\'csManagerClient.showUploadWindow()\' class="bcfbutton bcfeditbutton"><i class="bx bx-upload"></i></button>';
+        html += '<button onclick=\'csManagerClient.showUploadWindow()\' class="bcfbutton fileUploadButton"><i class="bx bx-upload"></i></button>';
         html += '<div style="top:40px;position:relative;">';
 
         for (var i in this._modelHash) {
@@ -193,6 +194,15 @@ class CsManagerClient {
                 }
             },
             {
+                name: 'Generate XML',
+                fun: async function (item) {
+                    let modelid = item.trigger[0].id.split("_")[1];
+                   
+                    await fetch(serveraddress + '/api/generateXML/' + modelid, { method: 'PUT'});
+                }
+            },
+
+            {
                 name: 'Download STEP',
                 fun: async function (item) {
                     let modelid = item.trigger[0].id.split("_")[1];
@@ -204,6 +214,17 @@ class CsManagerClient {
                     csManagerClient._exportToFile(byteArray, csManagerClient._modelHash[modelid].name + ".step");
                    
 
+                }
+            },
+            {
+                name: 'Download XML',
+                fun: async function (item) {
+                    let modelid = item.trigger[0].id.split("_")[1];
+
+                    let res = await fetch(serveraddress + '/api/xml/' + modelid);
+                    let ab = await res.arrayBuffer();
+                    let byteArray = new Uint8Array(ab);
+                    csManagerClient._exportToFile(byteArray, csManagerClient._modelHash[modelid].name + ".xml");                   
                 }
             },
             {
@@ -240,18 +261,23 @@ class CsManagerClient {
         $("[id^=modelmenubutton]").each(function (index) {
             let modelid = this.id.split("_")[1];
             let item = csManagerClient._modelHash[modelid];
-            let newViewerMenu;
+            let newViewerMenu = [viewermenu[4],viewermenu[5]];
             if (item.hasStep == "true")
             {
-                newViewerMenu = [viewermenu[1], viewermenu[2],viewermenu[3]];
-            }
-            else if (item.hasStep == "pending")
+                newViewerMenu.unshift(viewermenu[2]);
+            }        
+            else if (!item.hasStep || item.hasStep == "false")
             {
-                newViewerMenu = [viewermenu[2],viewermenu[3]];
+                newViewerMenu.unshift(viewermenu[0]);
             }
-            else
+
+            if (item.hasXML && item.hasXML == "true")
             {
-                newViewerMenu = [viewermenu[0], viewermenu[2],viewermenu[3]];
+                newViewerMenu.unshift(viewermenu[3]);
+            }        
+            else if (!item.hasXML || item.hasXML == "false")
+            {
+                newViewerMenu.unshift(viewermenu[1]);
             }
 
             $(this).contextMenu("menu", newViewerMenu, {

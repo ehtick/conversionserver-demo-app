@@ -20,7 +20,6 @@ async function setupApp() {
   });
 
   mainUI = new MainUI();
-  mainUI.setupMenu();
   mainUI.registerSideBars("sidebar_models", 450);
 
 
@@ -30,6 +29,7 @@ async function setupApp() {
   myAdmin.adminProject.setLoadProjectCallback(loadProjectCallback);
 
   await myAdmin.checkLogin();
+  mainUI.setupMenu();
 
 }
 
