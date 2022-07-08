@@ -132,6 +132,7 @@ class CsManagerClient {
                 }
                 this._modelHash[data[i].id].image = part;
                 this._modelHash[data[i].id].hasStep  = data[i].hasStep;
+                this._modelHash[data[i].id].hasGLB  = data[i].hasGLB;
                 this._modelHash[data[i].id].hasXML  = data[i].hasXML;
             }
         }
@@ -201,7 +202,14 @@ class CsManagerClient {
                     await fetch(serveraddress + '/api/generateXML/' + modelid, { method: 'PUT'});
                 }
             },
-
+            {
+                name: 'Generate GLB',
+                fun: async function (item) {
+                    let modelid = item.trigger[0].id.split("_")[1];
+                   
+                    await fetch(serveraddress + '/api/generateGLB/' + modelid, { method: 'PUT'});
+                }
+            },
             {
                 name: 'Download STEP',
                 fun: async function (item) {
@@ -225,6 +233,17 @@ class CsManagerClient {
                     let ab = await res.arrayBuffer();
                     let byteArray = new Uint8Array(ab);
                     csManagerClient._exportToFile(byteArray, csManagerClient._modelHash[modelid].name + ".xml");                   
+                }
+            },
+            {
+                name: 'Download GLB',
+                fun: async function (item) {
+                    let modelid = item.trigger[0].id.split("_")[1];
+
+                    let res = await fetch(serveraddress + '/api/glb/' + modelid);
+                    let ab = await res.arrayBuffer();
+                    let byteArray = new Uint8Array(ab);
+                    csManagerClient._exportToFile(byteArray, csManagerClient._modelHash[modelid].name + ".glb");                   
                 }
             },
             {
@@ -261,10 +280,10 @@ class CsManagerClient {
         $("[id^=modelmenubutton]").each(function (index) {
             let modelid = this.id.split("_")[1];
             let item = csManagerClient._modelHash[modelid];
-            let newViewerMenu = [viewermenu[4],viewermenu[5]];
+            let newViewerMenu = [viewermenu[6],viewermenu[7]];
             if (item.hasStep == "true")
             {
-                newViewerMenu.unshift(viewermenu[2]);
+                newViewerMenu.unshift(viewermenu[3]);
             }        
             else if (!item.hasStep || item.hasStep == "false")
             {
@@ -273,11 +292,21 @@ class CsManagerClient {
 
             if (item.hasXML && item.hasXML == "true")
             {
-                newViewerMenu.unshift(viewermenu[3]);
+                newViewerMenu.unshift(viewermenu[4]);
             }        
             else if (!item.hasXML || item.hasXML == "false")
             {
                 newViewerMenu.unshift(viewermenu[1]);
+            }
+
+            
+            if (item.hasGLB && item.hasGLB == "true")
+            {
+                newViewerMenu.unshift(viewermenu[5]);
+            }        
+            else if (!item.hasGLB || item.hasGLB == "false")
+            {
+                newViewerMenu.unshift(viewermenu[2]);
             }
 
             $(this).contextMenu("menu", newViewerMenu, {

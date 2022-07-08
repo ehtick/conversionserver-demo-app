@@ -53,6 +53,12 @@ exports.getSTEP = async(req, res, next) => {
     res.send(Buffer.from(result));
 };
 
+
+exports.getGLB = async(req, res, next) => {
+    let result = await csmanager.getGLB(req.params.itemid,req.session.project);
+    res.send(Buffer.from(result));
+};
+
 exports.getXML = async(req, res, next) => {
     let result = await csmanager.getXML(req.params.itemid,req.session.project);
     res.send(Buffer.from(result));
@@ -82,6 +88,18 @@ exports.deleteModel = async (req, res, next) => {
 
 exports.processWebhook = async (req, res, next) => {
     csmanager.updateConversionStatus(req.body.id,req.body.files);
+    res.sendStatus(200);
+};
+
+
+exports.generateGLB = async (req, res, next) => {
+    
+    if (config.get('app.demoMode')) {
+        res.json({ERROR:"Not authorized."});
+        return;
+    }
+
+    csmanager.generateGLB(req.params.itemid,req.session.project);
     res.sendStatus(200);
 };
 

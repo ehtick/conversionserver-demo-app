@@ -25,6 +25,7 @@ exports.process = async (tempid, filename, project,startpath) => {
         filesize: stats.size,
         uploaded: new Date(),
         hasSTEP: "false",
+        hasGLB: "false",
         hasXML: "false",
         project:project
 
@@ -68,6 +69,7 @@ exports.getUploadToken = async (name, size, project) => {
             filesize: size,
             uploaded: new Date(),
             hasSTEP: "false",
+            hasGLB: "false",
             hasXML: "false",
             project: project
         });
@@ -126,6 +128,24 @@ exports.generateSTEP = async (itemid, project, startpath) => {
 };
 
 
+
+exports.generateGLB = async (itemid, project, startpath) => {
+    
+    let item = await CsFiles.findOne({ "_id": itemid, project:project});
+    if (item.hasGLB == "false")
+    {
+        item.hasGLB = "pending";
+        await item.save();
+        console.log("processing GLB:" + item.name);
+        let api_arg  = {conversionCommandLine:["--output_glb",""] };            
+        res = await fetch(conversionServiceURI + '/api/reconvert/' + item.storageID, { method: 'put',headers: { 'CS-API-Arg': JSON.stringify(api_arg) } });
+         _updated();
+
+    }
+
+};
+
+
 exports.generateXML = async (itemid, project, startpath) => {
     
     let item = await CsFiles.findOne({ "_id": itemid, project:project});
@@ -147,7 +167,7 @@ exports.getModels = async (project) => {
     let res = [];
     for (let i = 0; i < models.length; i++) {
         res.push({ name: models[i].name, id: models[i]._id.toString(), pending: !models[i].converted, category:models[i].category,uploaded:models[i].uploaded, filesize:models[i].filesize, hasStep:models[i].hasSTEP,
-            hasXML:models[i].hasXML});
+            hasXML:models[i].hasXML,hasGLB:models[i].hasGLB});
     }
     return {"updated":_updatedTime.toString(), "modelarray":res};
 };
@@ -157,6 +177,13 @@ exports.getSTEP = async (itemid,project) => {
     let res = await fetch(conversionServiceURI + '/api/file/' + item.storageID + "/step");
     return await res.arrayBuffer();
 };
+
+exports.getGLB = async (itemid,project) => {
+    let item = await CsFiles.findOne({ "_id": itemid, project:project});
+    let res = await fetch(conversionServiceURI + '/api/file/' + item.storageID + "/glb");
+    return await res.arrayBuffer();
+};
+
 
 exports.getXML = async (itemid,project) => {
     let item = await CsFiles.findOne({ "_id": itemid, project:project});
@@ -187,7 +214,7 @@ exports.getPNG = async (itemid, project) => {
 exports.updateConversionStatus =  async (storageId, files) => {
     let item = await CsFiles.findOne({ "storageID": storageId});
 
-    if (files && (item.hasSTEP == "pending" || item.hasXML == "pending"))
+    if (files && (item.hasSTEP == "pending" || item.hasXML == "pending" || item.hasGLB == "pending"))
     {
         for (let i=0;i<files.length;i++)
         {
@@ -200,6 +227,12 @@ exports.updateConversionStatus =  async (storageId, files) => {
             if (files[i].indexOf(".xml") !=-1)
             {
                 item.hasXML = "true";
+                await item.save();
+                _updated();
+            }
+            if (files[i].indexOf(".glb") !=-1)
+            {
+                item.hasGLB = "true";
                 await item.save();
                 _updated();
             }

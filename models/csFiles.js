@@ -21,6 +21,12 @@ const csFilesSchema = new Schema({
     required: false
   },
 
+  hasGLB: {
+    type: String,
+    required: false
+  },
+
+
   hasXML: {
     type: String,
     required: false

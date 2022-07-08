@@ -15,6 +15,8 @@ router.get('/scs/:itemid', apiController.getSCS);
 router.get('/png/:itemid', apiController.getPNG);
 router.get('/step/:itemid', apiController.getSTEP);
 router.put('/generateStep/:itemid', apiController.generateSTEP);
+router.get('/glb/:itemid', apiController.getGLB);
+router.put('/generateGLB/:itemid', apiController.generateGLB);
 
 router.get('/xml/:itemid', apiController.getXML);
 router.put('/generateXML/:itemid', apiController.generateXML);
