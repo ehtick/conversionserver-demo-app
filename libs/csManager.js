@@ -146,6 +146,19 @@ exports.generateGLB = async (itemid, project, startpath) => {
 };
 
 
+
+exports.generateCustomImage = async (itemid, project, startpath) => {
+
+    let item = await CsFiles.findOne({ "_id": itemid, project: project });
+
+    await item.save();
+    console.log("processing custom image:" + item.name);
+    let api_arg = { customImageCode: "let rmatrix = Communicator.Matrix.xAxisRotation(-90);await hwv.model.setNodeMatrix(hwv.model.getRootNode(), rmatrix);await hwv.view.fitWorld();" };
+    res = await fetch(conversionServiceURI + '/api/customImage/' + item.storageID, { method: 'put', headers: { 'CS-API-Arg': JSON.stringify(api_arg) } });
+    _updated();
+};
+
+
 exports.generateXML = async (itemid, project, startpath) => {
     
     let item = await CsFiles.findOne({ "_id": itemid, project:project});

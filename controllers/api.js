@@ -104,6 +104,18 @@ exports.generateGLB = async (req, res, next) => {
 };
 
 
+exports.generateCustomImage = async (req, res, next) => {
+    
+    if (config.get('app.demoMode')) {
+        res.json({ERROR:"Not authorized."});
+        return;
+    }
+
+    csmanager.generateCustomImage(req.params.itemid,req.session.project);
+    res.sendStatus(200);
+};
+
+
 exports.generateSTEP = async (req, res, next) => {
     
     if (config.get('app.demoMode')) {

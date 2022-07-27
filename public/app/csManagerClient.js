@@ -261,6 +261,15 @@ class CsManagerClient {
                 }
             },
             {
+                name: 'Generate Custom Image',
+                fun: async function (item) {
+                    let modelid = item.trigger[0].id.split("_")[1];
+
+                    let res = await fetch(serveraddress + '/api/customImage/' + modelid, { method: 'PUT'});
+                                     
+                }
+            },
+            {
                 name: 'Delete',
                 fun: async function (item) {
                     //csManagerClient
@@ -280,7 +289,7 @@ class CsManagerClient {
         $("[id^=modelmenubutton]").each(function (index) {
             let modelid = this.id.split("_")[1];
             let item = csManagerClient._modelHash[modelid];
-            let newViewerMenu = [viewermenu[6],viewermenu[7]];
+            let newViewerMenu = [viewermenu[6],viewermenu[7],viewermenu[8]];
             if (item.hasStep == "true")
             {
                 newViewerMenu.unshift(viewermenu[3]);

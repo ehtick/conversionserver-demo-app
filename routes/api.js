@@ -17,6 +17,7 @@ router.get('/step/:itemid', apiController.getSTEP);
 router.put('/generateStep/:itemid', apiController.generateSTEP);
 router.get('/glb/:itemid', apiController.getGLB);
 router.put('/generateGLB/:itemid', apiController.generateGLB);
+router.put('/customImage/:itemid', apiController.generateCustomImage);
 
 router.get('/xml/:itemid', apiController.getXML);
 router.put('/generateXML/:itemid', apiController.generateXML);
