@@ -107,7 +107,26 @@ mongoose
       csmanager.init(config.get('app.conversionServiceURI'));
 
     console.log("listening");
-    app.listen(3000);
+    var server = app.listen(3000);
+
+
+    var httpProxy = require('http-proxy');
+
+
+    var proxy = new httpProxy.createProxyServer({
+    });
+
+    proxy.on('error', function (err, req, res) {
+        console.log(err);
+    });
+
+    server.on('upgrade', async function (req, socket, head) {
+            proxy.ws(req, socket, head, { target: 'ws://127.0.0.1:3200' });
+    });
+
+
+
+
   })
   .catch(err => {
     console.log(err);
