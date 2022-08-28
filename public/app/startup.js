@@ -80,7 +80,7 @@ async function initializeViewer()
 
     viewer = new Communicator.WebViewer({
       containerId: "content",
-      endpointUri: 'ws://' + window.location.host + '?token=' + data.sessionid,
+      endpointUri: 'ws://' + data.serverurl + ":" + data.port + '?token=' + data.sessionid,
       model: "_empty",
       rendererType:  Communicator.RendererType.Client
     });
