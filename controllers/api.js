@@ -54,8 +54,21 @@ exports.getSTEP = async(req, res, next) => {
 };
 
 
+exports.getFBX = async(req, res, next) => {
+    let result = await csmanager.getFBX(req.params.itemid,req.session.project);
+    res.send(Buffer.from(result));
+};
+
+
+
 exports.getGLB = async(req, res, next) => {
     let result = await csmanager.getGLB(req.params.itemid,req.session.project);
+    res.send(Buffer.from(result));
+};
+
+
+exports.getHSF = async(req, res, next) => {
+    let result = await csmanager.getHSF(req.params.itemid,req.session.project);
     res.send(Buffer.from(result));
 };
 
@@ -104,6 +117,19 @@ exports.generateGLB = async (req, res, next) => {
 };
 
 
+
+exports.generateHSF = async (req, res, next) => {
+    
+    if (config.get('app.demoMode')) {
+        res.json({ERROR:"Not authorized."});
+        return;
+    }
+
+    csmanager.generateHSF(req.params.itemid,req.session.project);
+    res.sendStatus(200);
+};
+
+
 exports.generateCustomImage = async (req, res, next) => {
     
     if (config.get('app.demoMode')) {
@@ -124,6 +150,19 @@ exports.generateSTEP = async (req, res, next) => {
     }
 
     csmanager.generateSTEP(req.params.itemid,req.session.project);
+    res.sendStatus(200);
+};
+
+
+
+exports.generateFBX = async (req, res, next) => {
+    
+    if (config.get('app.demoMode')) {
+        res.json({ERROR:"Not authorized."});
+        return;
+    }
+
+    csmanager.generateFBX(req.params.itemid,req.session.project);
     res.sendStatus(200);
 };
 

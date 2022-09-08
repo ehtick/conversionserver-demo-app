@@ -36,6 +36,8 @@ async function copyStarterProject(user,hub)
                 storageid: files[i].storageid,
                 filesize: files[i].filesize,
                 hasStep: files[i].hasStep,
+                hasFBX: files[i].hasFBX,
+                hasHSF: files[i].hasHSF,
                 uploaded: files[i].uploaded,              
             });
             await newfile.save();            

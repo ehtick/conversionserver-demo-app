@@ -132,6 +132,8 @@ class CsManagerClient {
                 }
                 this._modelHash[data[i].id].image = part;
                 this._modelHash[data[i].id].hasStep  = data[i].hasStep;
+                this._modelHash[data[i].id].hasFBX  = data[i].hasFBX;
+                this._modelHash[data[i].id].hasHSF  = data[i].hasHSF;
                 this._modelHash[data[i].id].hasGLB  = data[i].hasGLB;
                 this._modelHash[data[i].id].hasXML  = data[i].hasXML;
             }
@@ -283,7 +285,45 @@ class CsManagerClient {
                     await fetch(serveraddress + '/api/deleteModel/' + modelid, { method: 'PUT'});
 
                 }
-            }
+            },
+            {
+                name: 'Generate HSF',
+                fun: async function (item) {
+                    let modelid = item.trigger[0].id.split("_")[1];
+                   
+                    await fetch(serveraddress + '/api/generateHSF/' + modelid, { method: 'PUT'});
+                }
+            },
+            {
+                name: 'Download HSF',
+                fun: async function (item) {
+                    let modelid = item.trigger[0].id.split("_")[1];
+
+                    let res = await fetch(serveraddress + '/api/hsf/' + modelid);
+                    let ab = await res.arrayBuffer();
+                    let byteArray = new Uint8Array(ab);
+                    csManagerClient._exportToFile(byteArray, csManagerClient._modelHash[modelid].name + ".hsf");                   
+                }
+            },
+            {
+                name: 'Generate FBX',
+                fun: async function (item) {
+                    let modelid = item.trigger[0].id.split("_")[1];
+                   
+                    await fetch(serveraddress + '/api/generateFBX/' + modelid, { method: 'PUT'});
+                }
+            },
+            {
+                name: 'Download FBX',
+                fun: async function (item) {
+                    let modelid = item.trigger[0].id.split("_")[1];
+
+                    let res = await fetch(serveraddress + '/api/fbx/' + modelid);
+                    let ab = await res.arrayBuffer();
+                    let byteArray = new Uint8Array(ab);
+                    csManagerClient._exportToFile(byteArray, csManagerClient._modelHash[modelid].name + ".fbx");                   
+                }
+            },
         ];
 
         $("[id^=modelmenubutton]").each(function (index) {
@@ -316,6 +356,23 @@ class CsManagerClient {
             else if (!item.hasGLB || item.hasGLB == "false")
             {
                 newViewerMenu.unshift(viewermenu[2]);
+            }
+
+            if (item.hasHSF && item.hasHSF == "true")
+            {
+                newViewerMenu.unshift(viewermenu[10]);
+            }        
+            else if (!item.hasHSF || item.hasHSF == "false")
+            {
+                newViewerMenu.unshift(viewermenu[9]);
+            }
+            if (item.hasFBX && item.hasFBX == "true")
+            {
+                newViewerMenu.unshift(viewermenu[12]);
+            }        
+            else if (!item.hasFBX || item.hasFBX == "false")
+            {
+                newViewerMenu.unshift(viewermenu[11]);
             }
 
             $(this).contextMenu("menu", newViewerMenu, {
