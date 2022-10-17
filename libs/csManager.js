@@ -335,7 +335,7 @@ exports.getStreamingSession =  async () => {
 
 exports.enableStreamAccess =  async (itemid, project, streamingSessionId) => {
     let item = await CsFiles.findOne({ "_id": itemid, project:project});
-    await fetch(conversionServiceURI + '/api/enableStreamAccess/' + streamingSessionId + "/" + item.storageID,{ method: 'put'});
+    await fetch(conversionServiceURI + '/api/enableStreamAccess/' + streamingSessionId,{ method: 'put',headers:{'items':JSON.stringify([item.storageID])}});
 };
 
 var ONE_HOUR = 60 * 60 * 1000;
