@@ -1,11 +1,6 @@
 const config = require('config');
 
-let csmanager;
-
-if (config.get('app.useCSAPI'))
-    csmanager = require('../libs/csManagerAPI');
-else
-    csmanager = require('../libs/csManager');
+let csmanager = require('../libs/csManager');
 
 exports.postUpload = async(req, res, next) => {
     if (config.get('app.demoMode')) {

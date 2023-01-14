@@ -29,12 +29,7 @@ process.on('uncaughtException', function (err) {
 
 //const conversionservice = require('ts3d-hc-conversionservice');
 
-let csmanager;
-
-if (config.get('app.useCSAPI'))
-  csmanager = require('./libs/csManagerAPI');
-else
-  csmanager = require('./libs/csManager');
+let csmanager = require('./libs/csManager');
 
 mongoose
   .connect(config.get('app.mongodbURI'))
@@ -101,10 +96,8 @@ mongoose
     app.use(middleware.requireLogin);
     app.use("/api", apiRoutes);
     
-    // if (config.get('app.useCSAPI'))
-    //   csmanager.init(conversionservice.server);
-    // else
-      csmanager.init(config.get('app.conversionServiceURI'));
+    
+    csmanager.init(config.get('app.conversionServiceURI'));
 
     console.log("listening");
     var server = app.listen(3000);
