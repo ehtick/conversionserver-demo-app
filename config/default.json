@@ -1,6 +1,6 @@
 {
   "app": {
-    "mongodbURI": "mongodb://127.0.0.1:27017/csfrontend",
+    "mongodbURI": "mongodb://127.0.0.1:27017/caas_demo_app",
     "conversionServiceURI": "http://localhost:3001",
     "useDirectFetch": false,
     "useStreaming": false,
